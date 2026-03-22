@@ -241,36 +241,6 @@ export default function DayView() {
     }));
   }
 
-  type ParsedItem = {
-    nome: string;
-    quantidade: number;
-    unidade: "g" | "ml";
-    proteina: number;
-    gorduras: number;
-    carboidratos: number;
-  };
-
-  async function handleAddBulk(mealId: string, itens: ParsedItem[]) {
-    setMutationError("");
-    const res = await fetch("/api/day", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "addItemsBulk", mealId, itens }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      setMutationError(data.error ?? "Erro ao adicionar itens.");
-      return;
-    }
-    const newItems = await res.json();
-    setDayData((d) => ({
-      ...d,
-      refeicoes: d.refeicoes.map((m) =>
-        m.id === mealId ? { ...m, itens: [...m.itens, ...newItems] } : m,
-      ),
-    }));
-  }
-
   async function handleRemoveMeal(mealId: string) {
     setMutationError("");
     const res = await fetch("/api/day", {
