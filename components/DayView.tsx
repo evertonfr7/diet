@@ -50,12 +50,32 @@ export default function DayView() {
     mealName: string;
   } | null>(null);
 
+  const [waterIntake, setWaterIntake] = useState(0);
+  const [waterGoal, setWaterGoal] = useState(2000);
+
   const today = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+  const todayKey = new Date().toLocaleDateString("en-CA");
+
+  useEffect(() => {
+    const storedIntake = localStorage.getItem(`water-intake-${todayKey}`);
+    const storedGoal = localStorage.getItem("water-goal");
+    if (storedIntake) setWaterIntake(Number(storedIntake));
+    if (storedGoal) setWaterGoal(Number(storedGoal));
+  }, [todayKey]);
+
+  function addWater(ml: number) {
+    setWaterIntake((prev) => {
+      const next = prev + ml;
+      localStorage.setItem(`water-intake-${todayKey}`, String(next));
+      return next;
+    });
+  }
 
   const fetchAll = useCallback(async () => {
     try {
@@ -153,6 +173,30 @@ export default function DayView() {
           : m,
       ),
     }));
+  }
+
+  async function handleSaveAsFood(meal: Meal) {
+    const proteina = meal.itens.reduce((s, i) => s + i.proteina, 0);
+    const gorduras = meal.itens.reduce((s, i) => s + i.gorduras, 0);
+    const carboidratos = meal.itens.reduce((s, i) => s + i.carboidratos, 0);
+    const res = await fetch("/api/foods", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nome: meal.nome,
+        proteina: Math.round(proteina * 10) / 10,
+        gorduras: Math.round(gorduras * 10) / 10,
+        carboidratos: Math.round(carboidratos * 10) / 10,
+        unidade: "g",
+      }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setMutationError(data.error ?? "Erro ao salvar refeição como alimento.");
+      return;
+    }
+    const food: Food = await res.json();
+    setFoods((f) => [...f, food]);
   }
 
   async function handleRemoveMeal(mealId: string) {
@@ -274,7 +318,13 @@ export default function DayView() {
       )}
 
       {/* Macro Summary */}
-      <MacroSummary totals={totals} targets={targets} />
+      <MacroSummary
+        totals={totals}
+        targets={targets}
+        waterIntake={waterIntake}
+        waterGoal={waterGoal}
+        onAddWater={addWater}
+      />
 
       {/* Protocol section */}
       <div className="flex items-center justify-between">
@@ -303,6 +353,7 @@ export default function DayView() {
             }
             onRemoveItem={handleRemoveItem}
             onRemoveMeal={handleRemoveMeal}
+            onSaveAsFood={handleSaveAsFood}
           />
         ))}
         <AddMealForm onAdd={handleAddMeal} />

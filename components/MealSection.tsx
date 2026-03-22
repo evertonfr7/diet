@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Meal } from "@/lib/types";
 
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
   onAddItem: (mealId: string) => void;
   onRemoveItem: (mealId: string, itemId: string) => void;
   onRemoveMeal: (mealId: string) => void;
+  onSaveAsFood: (meal: Meal) => Promise<void>;
 };
 
 export default function MealSection({
@@ -14,7 +16,21 @@ export default function MealSection({
   onAddItem,
   onRemoveItem,
   onRemoveMeal,
+  onSaveAsFood,
 }: Props) {
+  const [saving, setSaving] = useState(false);
+  const [savedOk, setSavedOk] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await onSaveAsFood(meal);
+      setSavedOk(true);
+      setTimeout(() => setSavedOk(false), 2500);
+    } finally {
+      setSaving(false);
+    }
+  }
   const mealProtein = meal.itens.reduce((s, i) => s + i.proteina, 0);
   const mealFat = meal.itens.reduce((s, i) => s + i.gorduras, 0);
   const mealCarbs = meal.itens.reduce((s, i) => s + i.carboidratos, 0);
@@ -39,6 +55,14 @@ export default function MealSection({
             className="text-xs border border-green-200 text-green-700 hover:bg-green-50 px-3 py-1.5 rounded-xl font-medium transition-colors"
           >
             + Alimento
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving || meal.itens.length === 0}
+            className="text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-3 py-1.5 rounded-xl font-medium transition-colors disabled:opacity-40"
+            title="Salvar refeição como alimento"
+          >
+            {savedOk ? "✓ Salvo" : saving ? "..." : "💾 Salvar"}
           </button>
           <button
             onClick={() => onRemoveMeal(meal.id)}

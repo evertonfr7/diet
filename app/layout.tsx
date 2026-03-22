@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import PwaSetup from "@/components/PwaSetup";
 
 export const metadata: Metadata = {
   title: "Clinical Diet",
@@ -14,7 +15,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <meta name="theme-color" content="#1A3A2A" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
+        <meta name="apple-mobile-web-app-title" content="Clinical Diet" />
+      </head>
       <body className="bg-[#F4F7F5] min-h-screen">
+        <PwaSetup />
         <Sidebar />
         {/* offset for mobile top bar */}
         <div className="pt-14 lg:pt-0 lg:pl-60">

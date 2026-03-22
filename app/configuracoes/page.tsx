@@ -50,6 +50,23 @@ export default function ConfiguracoesPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [waterGoal, setWaterGoal] = useState(2000);
+  const [waterGoalMessage, setWaterGoalMessage] = useState<string | null>(null);
+  const [notifPermission, setNotifPermission] = useState<
+    NotificationPermission | ""
+  >("");
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifInterval, setNotifInterval] = useState(30);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("water-goal");
+    if (stored) setWaterGoal(Number(stored));
+    if ("Notification" in window) setNotifPermission(Notification.permission);
+    setNotifEnabled(localStorage.getItem("water-notif-enabled") === "true");
+    setNotifInterval(
+      Number(localStorage.getItem("water-notif-interval") || 30),
+    );
+  }, []);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -66,6 +83,38 @@ export default function ConfiguracoesPage() {
       setForm((f) => ({ ...f, [key]: Number(e.target.value) }));
       setMessage(null);
     };
+  }
+
+  function handleWaterGoalChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = Math.max(1, Number(e.target.value));
+    setWaterGoal(val);
+    localStorage.setItem("water-goal", String(val));
+    setWaterGoalMessage("Meta de água salva!");
+    setTimeout(() => setWaterGoalMessage(null), 2000);
+  }
+
+  async function requestNotifPermission() {
+    if (!("Notification" in window)) return;
+    const result = await Notification.requestPermission();
+    setNotifPermission(result);
+    if (result === "granted") {
+      setNotifEnabled(true);
+      localStorage.setItem("water-notif-enabled", "true");
+      window.dispatchEvent(new Event("water-notif-changed"));
+    }
+  }
+
+  function toggleNotif(enabled: boolean) {
+    setNotifEnabled(enabled);
+    localStorage.setItem("water-notif-enabled", String(enabled));
+    window.dispatchEvent(new Event("water-notif-changed"));
+  }
+
+  function handleNotifIntervalChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = Math.max(1, Number(e.target.value));
+    setNotifInterval(val);
+    localStorage.setItem("water-notif-interval", String(val));
+    window.dispatchEvent(new Event("water-notif-changed"));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -169,6 +218,100 @@ export default function ConfiguracoesPage() {
             </button>
           </form>
         )}
+      </div>
+
+      {/* Meta de Água */}
+      <div className="bg-white rounded-2xl shadow-sm p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-5">
+          Meta de Água
+        </h2>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Meta diária <span className="text-xs text-gray-400 ml-1">(ml)</span>
+          </label>
+          <input
+            type="number"
+            min="100"
+            step="100"
+            value={waterGoal}
+            onChange={handleWaterGoalChange}
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
+          />
+          {waterGoalMessage && (
+            <p className="text-xs text-green-600 mt-2">{waterGoalMessage}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Notificações de Água */}
+      <div className="bg-white rounded-2xl shadow-sm p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-5">
+          Notificações de Água
+        </h2>
+        <div className="space-y-4">
+          {notifPermission === "" || notifPermission === "default" ? (
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <p className="text-sm text-gray-600">
+                Ative para receber lembretes periódicos de hidratação.
+              </p>
+              <button
+                onClick={requestNotifPermission}
+                className="text-sm bg-cyan-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-cyan-700 transition-colors whitespace-nowrap"
+              >
+                Ativar notificações
+              </button>
+            </div>
+          ) : notifPermission === "denied" ? (
+            <p className="text-sm text-red-500">
+              Notificações bloqueadas no navegador. Acesse as configurações do
+              site para desbloquear.
+            </p>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Lembretes ativos
+                </label>
+                <button
+                  type="button"
+                  onClick={() => toggleNotif(!notifEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifEnabled ? "bg-cyan-500" : "bg-gray-200"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      notifEnabled ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {notifEnabled && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Intervalo entre lembretes{" "}
+                    <span className="text-xs text-gray-400 ml-1">
+                      (minutos)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={notifInterval}
+                    onChange={handleNotifIntervalChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
+                  />
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    Lembrete a cada {notifInterval} min enquanto o app estiver
+                    aberto.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
