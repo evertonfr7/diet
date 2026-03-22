@@ -37,3 +37,6 @@ export function getTodayDate(): string {
     timeZone: process.env.TZ_LOCAL ?? 'UTC',
   }).format(new Date())
 }
+
+export const PUSH_SUBSCRIPTION_KEY = 'diet:push-subscription'
+export const PUSH_SCHEDULE_ID_KEY = 'diet:push-schedule-id'

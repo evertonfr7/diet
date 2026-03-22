@@ -2,8 +2,7 @@
 name: planner
 description: Gera specs detalhadas de features antes de qualquer implementação
 model: Claude Sonnet 4.6 (copilot)
-tools:
-  - search/codebase
+# tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo'] # specify the tools this agent can use. If not set, all enabled tools are allowed.
 handoffs:
   - label: "▶ Passar para Implementer"
     agent: implementer

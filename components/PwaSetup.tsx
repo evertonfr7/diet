@@ -47,6 +47,8 @@ export default function PwaSetup() {
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
       if (localStorage.getItem("water-notif-enabled") !== "true") return;
+      // Skip setInterval fallback when push subscription is active
+      if (localStorage.getItem("push-subscribed") === "true") return;
 
       const minutes = Number(
         localStorage.getItem("water-notif-interval") || 30,

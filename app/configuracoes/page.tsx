@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { MacroTargets } from "@/lib/types";
 
 const FIELDS: {
@@ -42,6 +42,17 @@ const DEFAULT: MacroTargets = {
   gorduras: 100,
 };
 
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const output = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) {
+    output[i] = rawData.charCodeAt(i);
+  }
+  return output;
+}
+
 export default function ConfiguracoesPage() {
   const [form, setForm] = useState<MacroTargets>(DEFAULT);
   const [loading, setLoading] = useState(true);
@@ -57,6 +68,9 @@ export default function ConfiguracoesPage() {
   >("");
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifInterval, setNotifInterval] = useState(30);
+  const [pushSupported, setPushSupported] = useState(false);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const resubscribeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("water-goal");
@@ -66,6 +80,8 @@ export default function ConfiguracoesPage() {
     setNotifInterval(
       Number(localStorage.getItem("water-notif-interval") || 30),
     );
+    setPushSupported("PushManager" in window);
+    setPushSubscribed(localStorage.getItem("push-subscribed") === "true");
   }, []);
 
   useEffect(() => {
@@ -93,6 +109,48 @@ export default function ConfiguracoesPage() {
     setTimeout(() => setWaterGoalMessage(null), 2000);
   }
 
+  async function subscribePush(intervalMin: number) {
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!vapidKey) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        });
+      }
+      const res = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscription: sub.toJSON(),
+          intervalMinutes: intervalMin,
+        }),
+      });
+      if (res.ok) {
+        setPushSubscribed(true);
+        localStorage.setItem("push-subscribed", "true");
+      }
+    } catch (err) {
+      console.error("[push] subscription failed:", err);
+    }
+  }
+
+  async function unsubscribePush() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) await sub.unsubscribe();
+      await fetch("/api/push/subscribe", { method: "DELETE" });
+      setPushSubscribed(false);
+      localStorage.removeItem("push-subscribed");
+    } catch (err) {
+      console.error("[push] unsubscription failed:", err);
+    }
+  }
+
   async function requestNotifPermission() {
     if (!("Notification" in window)) return;
     const result = await Notification.requestPermission();
@@ -101,13 +159,23 @@ export default function ConfiguracoesPage() {
       setNotifEnabled(true);
       localStorage.setItem("water-notif-enabled", "true");
       window.dispatchEvent(new Event("water-notif-changed"));
+      if (pushSupported) {
+        await subscribePush(notifInterval);
+      }
     }
   }
 
-  function toggleNotif(enabled: boolean) {
+  async function toggleNotif(enabled: boolean) {
     setNotifEnabled(enabled);
     localStorage.setItem("water-notif-enabled", String(enabled));
     window.dispatchEvent(new Event("water-notif-changed"));
+    if (pushSupported) {
+      if (enabled) {
+        await subscribePush(notifInterval);
+      } else {
+        await unsubscribePush();
+      }
+    }
   }
 
   function handleNotifIntervalChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -115,6 +183,10 @@ export default function ConfiguracoesPage() {
     setNotifInterval(val);
     localStorage.setItem("water-notif-interval", String(val));
     window.dispatchEvent(new Event("water-notif-changed"));
+    if (pushSubscribed) {
+      if (resubscribeTimer.current) clearTimeout(resubscribeTimer.current);
+      resubscribeTimer.current = setTimeout(() => subscribePush(val), 1000);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -304,8 +376,9 @@ export default function ConfiguracoesPage() {
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
                   />
                   <p className="text-xs text-gray-400 mt-1.5">
-                    Lembrete a cada {notifInterval} min enquanto o app estiver
-                    aberto.
+                    {pushSubscribed
+                      ? `Lembrete a cada ${notifInterval} min, mesmo com o app fechado. ✅`
+                      : `Lembrete a cada ${notifInterval} min enquanto o app estiver aberto.`}
                   </p>
                 </div>
               )}

@@ -2,8 +2,7 @@
 name: reviewer
 description: Revisa o código implementado e aponta problemas antes do merge
 model: Claude Sonnet 4.6 (copilot)
-tools:
-  - search/codebase
+# tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo'] # specify the tools this agent can use. If not set, all enabled tools are allowed.
 ---
 # Agente Revisor
 
