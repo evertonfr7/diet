@@ -41,26 +41,39 @@ export default function MealSection({
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Meal header */}
-      <div className="flex items-center justify-between px-5 py-4">
-        <div>
-          <h3 className="font-semibold text-gray-900 text-base">{meal.nome}</h3>
-          {meal.itens.length > 0 && (
-            <p className="text-xs text-gray-400 mt-0.5">
-              {mealKcal} kcal · P {Math.round(mealProtein)}g · G{" "}
-              {Math.round(mealFat)}g · C {Math.round(mealCarbs)}g
-            </p>
-          )}
+      <div className="px-4 pt-4 pb-3">
+        {/* Linha 1: nome + ✕ */}
+        <div className="flex items-start justify-between">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-gray-900 text-base leading-snug">
+              {meal.nome}
+            </h3>
+            {meal.itens.length > 0 && (
+              <p className="text-xs text-gray-400 mt-0.5">
+                {mealKcal} kcal · P {Math.round(mealProtein)}g · G{" "}
+                {Math.round(mealFat)}g · C {Math.round(mealCarbs)}g
+              </p>
+            )}
+          </div>
+          <button
+            onClick={() => onRemoveMeal(meal.id)}
+            className="text-gray-300 hover:text-red-400 transition-colors p-1 ml-2 flex-shrink-0"
+            aria-label="Remover refeição"
+          >
+            ✕
+          </button>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Linha 2: botões de ação */}
+        <div className="flex gap-2 mt-3">
           <button
             onClick={() => onAddItem(meal.id)}
-            className="text-xs border border-green-200 text-green-700 hover:bg-green-50 px-3 py-1.5 rounded-xl font-medium transition-colors"
+            className="flex-1 text-xs border border-green-200 text-green-700 hover:bg-green-50 px-2 py-2 rounded-xl font-medium transition-colors"
           >
             + Alimento
           </button>
           <button
             onClick={() => onParseMeal(meal.id)}
-            className="text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-3 py-1.5 rounded-xl font-medium transition-colors"
+            className="flex-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors"
             title="Adicionar refeição por descrição em texto"
           >
             ✨ por texto
@@ -68,17 +81,10 @@ export default function MealSection({
           <button
             onClick={handleSave}
             disabled={saving || meal.itens.length === 0}
-            className="text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-3 py-1.5 rounded-xl font-medium transition-colors disabled:opacity-40"
+            className="flex-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors disabled:opacity-40"
             title="Salvar refeição como alimento"
           >
             {savedOk ? "✓ Salvo" : saving ? "..." : "💾 Salvar"}
-          </button>
-          <button
-            onClick={() => onRemoveMeal(meal.id)}
-            className="text-gray-300 hover:text-red-400 transition-colors p-1"
-            aria-label="Remover refeição"
-          >
-            ✕
           </button>
         </div>
       </div>
@@ -94,20 +100,28 @@ export default function MealSection({
               item.proteina * 4 + item.carboidratos * 4 + item.gorduras * 9,
             );
             return (
-              <li
-                key={item.id}
-                className="flex items-center justify-between px-5 py-3"
-              >
-                <div className="min-w-0 flex-1">
-                  <span className="text-sm font-medium text-gray-800">
-                    {item.nome}
-                  </span>
-                  <span className="text-xs text-gray-400 ml-1.5">
-                    {item.quantidade}
-                    {item.unidade ?? "g"}
-                  </span>
+              <li key={item.id} className="px-4 py-3">
+                {/* Linha 1: nome + ✕ */}
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-medium text-gray-800">
+                      {item.nome}
+                    </span>
+                    <span className="text-xs text-gray-400 ml-1.5">
+                      {item.quantidade}
+                      {item.unidade ?? "g"}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => onRemoveItem(meal.id, item.id)}
+                    className="text-gray-300 hover:text-red-400 transition-colors ml-2 flex-shrink-0"
+                    aria-label="Remover alimento"
+                  >
+                    ✕
+                  </button>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs ml-3 flex-shrink-0">
+                {/* Linha 2: badges de macros */}
+                <div className="flex items-center gap-1.5 text-xs mt-1.5">
                   <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-medium">
                     P {Math.round(item.proteina)}g
                   </span>
@@ -118,13 +132,6 @@ export default function MealSection({
                     C {Math.round(item.carboidratos)}g
                   </span>
                   <span className="text-gray-400 ml-0.5">{itemKcal} kcal</span>
-                  <button
-                    onClick={() => onRemoveItem(meal.id, item.id)}
-                    className="text-gray-300 hover:text-red-400 transition-colors ml-1"
-                    aria-label="Remover alimento"
-                  >
-                    ✕
-                  </button>
                 </div>
               </li>
             );
