@@ -63,6 +63,14 @@ export default function MealSection({
                 <span>P {Math.round(item.proteina)}g</span>
                 <span>G {Math.round(item.gorduras)}g</span>
                 <span>C {Math.round(item.carboidratos)}g</span>
+                <span className="text-gray-400">
+                  {Math.round(
+                    item.proteina * 4 +
+                      item.carboidratos * 4 +
+                      item.gorduras * 9,
+                  )}{" "}
+                  kcal
+                </span>
                 <button
                   onClick={() => onRemoveItem(meal.id, item.id)}
                   className="text-red-400 hover:text-red-600 transition-colors ml-1"

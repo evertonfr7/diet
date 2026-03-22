@@ -1,44 +1,55 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import type { Food } from '@/lib/types'
+import { useState } from "react";
+import type { Food } from "@/lib/types";
 
 type Props = {
-  mealId: string
-  mealName: string
-  foods: Food[]
-  onAdd: (mealId: string, alimentoId: number, quantidade: number) => Promise<void>
-  onClose: () => void
-}
+  mealId: string;
+  mealName: string;
+  foods: Food[];
+  onAdd: (
+    mealId: string,
+    alimentoId: number,
+    quantidade: number,
+  ) => Promise<void>;
+  onClose: () => void;
+};
 
-export default function AddItemModal({ mealId, mealName, foods, onAdd, onClose }: Props) {
-  const [alimentoId, setAlimentoId] = useState<number | ''>('')
-  const [quantidade, setQuantidade] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+export default function AddItemModal({
+  mealId,
+  mealName,
+  foods,
+  onAdd,
+  onClose,
+}: Props) {
+  const [alimentoId, setAlimentoId] = useState<number | "">("");
+  const [quantidade, setQuantidade] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const selectedFood = foods.find((f) => f.id === alimentoId)
-  const qty = parseFloat(quantidade) || 0
-  const preview = selectedFood && qty > 0
-    ? {
-        proteina: (selectedFood.proteina * qty) / 100,
-        gorduras: (selectedFood.gorduras * qty) / 100,
-        carboidratos: (selectedFood.carboidratos * qty) / 100,
-      }
-    : null
+  const selectedFood = foods.find((f) => f.id === alimentoId);
+  const qty = parseFloat(quantidade) || 0;
+  const preview =
+    selectedFood && qty > 0
+      ? {
+          proteina: (selectedFood.proteina * qty) / 100,
+          gorduras: (selectedFood.gorduras * qty) / 100,
+          carboidratos: (selectedFood.carboidratos * qty) / 100,
+        }
+      : null;
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!alimentoId || !quantidade) return
+    e.preventDefault();
+    if (!alimentoId || !quantidade) return;
     if (qty <= 0) {
-      setError('Informe uma quantidade válida.')
-      return
+      setError("Informe uma quantidade válida.");
+      return;
     }
-    setLoading(true)
-    setError('')
-    await onAdd(mealId, alimentoId as number, qty)
-    setLoading(false)
-    onClose()
+    setLoading(true);
+    setError("");
+    await onAdd(mealId, alimentoId as number, qty);
+    setLoading(false);
+    onClose();
   }
 
   return (
@@ -48,7 +59,10 @@ export default function AddItemModal({ mealId, mealName, foods, onAdd, onClose }
           <h2 className="font-semibold text-gray-900">
             Adicionar alimento a &quot;{mealName}&quot;
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+          >
             ✕
           </button>
         </div>
@@ -61,17 +75,22 @@ export default function AddItemModal({ mealId, mealName, foods, onAdd, onClose }
           ) : (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Alimento</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Alimento
+                </label>
                 <select
                   value={alimentoId}
-                  onChange={(e) => setAlimentoId(e.target.value ? Number(e.target.value) : '')}
+                  onChange={(e) =>
+                    setAlimentoId(e.target.value ? Number(e.target.value) : "")
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                   required
                 >
                   <option value="">Selecione...</option>
                   {foods.map((f) => (
                     <option key={f.id} value={f.id}>
-                      {f.nome} (P:{f.proteina}g · G:{f.gorduras}g · C:{f.carboidratos}g / 100g)
+                      {f.nome} (P:{f.proteina}g · G:{f.gorduras}g · C:
+                      {f.carboidratos}g / 100g)
                     </option>
                   ))}
                 </select>
@@ -81,6 +100,22 @@ export default function AddItemModal({ mealId, mealName, foods, onAdd, onClose }
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Quantidade (g)
                 </label>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {[30, 50, 100, 150, 200, 300].map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setQuantidade(String(g))}
+                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                        quantidade === String(g)
+                          ? "bg-green-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700"
+                      }`}
+                    >
+                      {g}g
+                    </button>
+                  ))}
+                </div>
                 <input
                   type="number"
                   min="1"
@@ -99,7 +134,12 @@ export default function AddItemModal({ mealId, mealName, foods, onAdd, onClose }
                   <span>G {Math.round(preview.gorduras)}g</span>
                   <span>C {Math.round(preview.carboidratos)}g</span>
                   <span className="text-gray-400">
-                    {Math.round(preview.proteina * 4 + preview.carboidratos * 4 + preview.gorduras * 9)} kcal
+                    {Math.round(
+                      preview.proteina * 4 +
+                        preview.carboidratos * 4 +
+                        preview.gorduras * 9,
+                    )}{" "}
+                    kcal
                   </span>
                 </div>
               )}
@@ -111,12 +151,12 @@ export default function AddItemModal({ mealId, mealName, foods, onAdd, onClose }
                 disabled={loading || !alimentoId || !quantidade}
                 className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Adicionando...' : 'Adicionar'}
+                {loading ? "Adicionando..." : "Adicionar"}
               </button>
             </>
           )}
         </form>
       </div>
     </div>
-  )
+  );
 }
