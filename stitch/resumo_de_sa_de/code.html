@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Nutrition - Analytics &amp; Insights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-high": "#e7e8e9",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed-dim": "#4ae176",
+              "on-tertiary-fixed": "#2a1700",
+              "on-primary-container": "#004b1e",
+              "error": "#ba1a1a",
+              "inverse-on-surface": "#f0f1f2",
+              "tertiary": "#855300",
+              "on-secondary-container": "#fffbff",
+              "on-surface": "#191c1d",
+              "surface-container-highest": "#e1e3e4",
+              "on-error-container": "#93000a",
+              "primary": "#006e2f",
+              "secondary": "#1d4ed8",
+              "secondary-fixed": "#dce1ff",
+              "on-tertiary": "#ffffff",
+              "surface": "#f8f9fa",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#653e00",
+              "background": "#f8f9fa",
+              "on-secondary-fixed-variant": "#0039b5",
+              "on-secondary": "#ffffff",
+              "on-tertiary-container": "#5c3800",
+              "surface-container-low": "#f3f4f5",
+              "on-background": "#191c1d",
+              "on-primary-fixed-variant": "#005321",
+              "surface-tint": "#006e2f",
+              "outline": "#6d7b6c",
+              "inverse-primary": "#4ae176",
+              "surface-dim": "#d9dadb",
+              "surface-bright": "#f8f9fa",
+              "on-primary": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "outline-variant": "#bccbb9",
+              "primary-container": "#22c55e",
+              "on-secondary-fixed": "#001551",
+              "on-primary-fixed": "#002109",
+              "on-surface-variant": "#3d4a3d",
+              "inverse-surface": "#2e3132",
+              "primary-fixed": "#6bff8f",
+              "tertiary-fixed": "#ffddb8",
+              "secondary-container": "#4069f2",
+              "surface-container": "#edeeef",
+              "tertiary-fixed-dim": "#ffb95f",
+              "secondary-fixed-dim": "#b7c4ff",
+              "on-error": "#ffffff",
+              "tertiary-container": "#ef9900"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl">
+<div class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-extrabold tracking-tighter text-green-800">Clinical Nutrition</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-slate-500 hover:bg-green-50/50 transition-colors px-3 py-1 rounded-lg" href="#">Dashboard</a>
+<a class="text-slate-500 hover:bg-green-50/50 transition-colors px-3 py-1 rounded-lg" href="#">Meal Journal</a>
+<a class="text-green-700 font-bold px-3 py-1 rounded-lg" href="#">Analytics</a>
+<a class="text-slate-500 hover:bg-green-50/50 transition-colors px-3 py-1 rounded-lg" href="#">Resources</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-green-50/50 transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-green-50/50 transition-colors rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="User profile avatar" class="w-8 h-8 rounded-full border border-outline-variant/20" data-alt="Close up of a professional male user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRGxV3JQZ7HL_Elwx-070nDy8hQRbTuCrnlSvjf9MtFCdp4RWq9etx2xZ9p6zPuaiyoeD18-EmQhZFVYBw9p5UhUbztsHu45Jz_h-FYkYJdoJ5TM_AbKdWCY9zxqKyPS3dl3wFkQSNgZHLr2ZQpzuaFIGwFask3iAAKh483pcwGbsj3mibBMMLH8DOhuvlDJfBKp641ivuSGHgJscmplcpwJLvMKuFXcO5vcLXMiWpv7Mkmkl2iVeOPZ5uDowJzV4NHbUYrz_3bak"/>
+</div>
+</div>
+<!-- Mobile Menu Trigger (Conceptual) -->
+<button class="md:hidden p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 md:pb-12 px-6 max-w-7xl mx-auto">
+<!-- Editorial Hero Section -->
+<section class="mb-16">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="max-w-2xl">
+<span class="text-primary font-bold tracking-widest text-xs uppercase">Performance Review</span>
+<h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mt-2 mb-4 leading-[1.1]">Nutritional <br/><span class="text-primary">Intelligence.</span></h1>
+<p class="text-on-surface-variant text-lg leading-relaxed font-medium">Your metabolic data indicates a 12% improvement in protein synthesis efficiency over the last 30 days.</p>
+</div>
+<div class="flex gap-2 p-1 bg-surface-container rounded-xl">
+<button class="px-6 py-2 bg-white rounded-lg shadow-sm text-sm font-bold text-on-surface">Weekly</button>
+<button class="px-6 py-2 text-sm font-semibold text-slate-500 hover:text-on-surface transition-colors">Monthly</button>
+</div>
+</div>
+</section>
+<!-- Bento Grid Analytics -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Large Chart: Calorie Intake Trend -->
+<div class="md:col-span-8 bg-surface-container-lowest rounded-xl p-8 flex flex-col gap-8">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-xl font-bold">Caloric Homeostasis</h3>
+<p class="text-slate-500 text-sm">Target: 2,400 kcal/day</p>
+</div>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="text-sm font-bold">+4% vs LW</span>
+</div>
+</div>
+<!-- Simulated Professional Chart -->
+<div class="h-64 w-full flex items-end justify-between gap-2 px-2 relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10">
+<div class="border-b border-on-surface w-full"></div>
+<div class="border-b border-on-surface w-full"></div>
+<div class="border-b border-on-surface w-full"></div>
+</div>
+<!-- Bars -->
+<div class="w-full bg-primary/10 rounded-t-lg h-[60%] hover:bg-primary/20 transition-colors relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">2,100</div>
+</div>
+<div class="w-full bg-primary/10 rounded-t-lg h-[75%] hover:bg-primary/20 transition-colors relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">2,450</div>
+</div>
+<div class="w-full bg-primary/10 rounded-t-lg h-[65%] hover:bg-primary/20 transition-colors relative group"></div>
+<div class="w-full bg-primary rounded-t-lg h-[90%] hover:bg-primary-container transition-colors relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">2,800</div>
+</div>
+<div class="w-full bg-primary/10 rounded-t-lg h-[70%] hover:bg-primary/20 transition-colors relative group"></div>
+<div class="w-full bg-primary/10 rounded-t-lg h-[80%] hover:bg-primary/20 transition-colors relative group"></div>
+<div class="w-full bg-primary/10 rounded-t-lg h-[55%] hover:bg-primary/20 transition-colors relative group"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- Side Bento: Macro Distribution -->
+<div class="md:col-span-4 bg-primary text-white rounded-xl p-8 flex flex-col justify-between overflow-hidden relative">
+<!-- Background visual element -->
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-primary-container/20 rounded-full blur-3xl"></div>
+<div>
+<h3 class="text-xl font-bold mb-1">Macro Balance</h3>
+<p class="text-primary-fixed/70 text-sm">Current distribution</p>
+</div>
+<div class="space-y-6 my-8">
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-tighter">
+<span>Protein</span>
+<span>185g / 40%</span>
+</div>
+<div class="h-1.5 w-full bg-white/20 rounded-full">
+<div class="h-full bg-white rounded-full w-[40%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-tighter">
+<span>Carbohydrates</span>
+<span>210g / 45%</span>
+</div>
+<div class="h-1.5 w-full bg-white/20 rounded-full">
+<div class="h-full bg-white/60 rounded-full w-[45%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-tighter">
+<span>Fats</span>
+<span>65g / 15%</span>
+</div>
+<div class="h-1.5 w-full bg-white/20 rounded-full">
+<div class="h-full bg-white/30 rounded-full w-[15%]"></div>
+</div>
+</div>
+</div>
+<button class="w-full py-3 bg-white text-primary font-bold rounded-lg text-sm hover:bg-slate-50 transition-colors">
+                    View Full Breakdown
+                </button>
+</div>
+<!-- Bottom Bento Row -->
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-6 flex items-center gap-6">
+<div class="w-16 h-16 bg-tertiary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div>
+<h4 class="font-bold text-lg leading-tight">Consistency King</h4>
+<p class="text-sm text-slate-500">14-day tracking streak maintained.</p>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-6 flex items-center gap-6">
+<div class="w-16 h-16 bg-secondary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div>
+<h4 class="font-bold text-lg leading-tight">Hydration Peak</h4>
+<p class="text-sm text-slate-500">Averaging 3.2L per day this week.</p>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-6 flex items-center gap-6">
+<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<h4 class="font-bold text-lg leading-tight">Metabolic Surge</h4>
+<p class="text-sm text-slate-500">Resting heart rate decreased by 2bpm.</p>
+</div>
+</div>
+</div>
+<!-- Editorial Content Block -->
+<section class="mt-20 flex flex-col md:flex-row gap-12 items-center">
+<div class="md:w-1/2">
+<img alt="Healthy salad bowl" class="rounded-[2.5rem] grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl" data-alt="Vibrant close up shot of a Mediterranean healthy grain bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm6KAjwrfmcKHkxHf1-w7u-MXwJBqUaXg2L8njqbaE-89WWBi7fnTH5B1o8LuTVTPtmXCweGOh1Up9gCfhnsgaDg15a8ApzDBVP2OfJINk5VpXiK4I_BVKAUJe1mKp12vHxAuuZr0IU24oCu4HDvcHSnAslK1sWs8y3DhSkh8uQuqlZ0amgrF6ZgUtN0Hou7jmvyI3DSTEoblyXehFLt9XSZFNuyp8P_3GggxrVvPb_Qeb32KXeVQq282nw8TcFvymSR-CaGSNVrA"/>
+</div>
+<div class="md:w-1/2 space-y-6">
+<h2 class="text-4xl font-bold tracking-tight">The Science of <br/>Recovery.</h2>
+<p class="text-on-surface-variant leading-relaxed">Your data shows a direct correlation between high-protein intake on Wednesdays and peak cardiovascular performance on Fridays. This 48-hour synthesis window is your metabolic sweet spot.</p>
+<div class="pt-4">
+<a class="text-primary font-bold flex items-center gap-2 group" href="#">
+                        Explore clinical research 
+                        <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Mobile -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-3 bg-slate-50/80 backdrop-blur-2xl md:hidden z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-manrope font-bold tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-[10px] font-manrope font-bold tracking-wide">Journal</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-green-100/50 text-green-800 rounded-2xl px-5 py-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">leaderboard</span>
+<span class="text-[10px] font-manrope font-bold tracking-wide">Progress</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-manrope font-bold tracking-wide">Profile</span>
+</a>
+</nav>
+</body></html>

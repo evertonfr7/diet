@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,42 +25,44 @@ export default function MacroChart({ data }: Props) {
   }));
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <ResponsiveContainer width="100%" height={360}>
-        <LineChart
+    <div className="bg-white rounded-2xl shadow-sm p-6">
+      <ResponsiveContainer width="100%" height={320}>
+        <BarChart
           data={chartData}
           margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+          barGap={2}
+          barCategoryGap="30%"
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-          <YAxis tick={{ fontSize: 12 }} unit="g" />
-          <Tooltip formatter={(v: number | string) => `${v}g`} />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="Proteína"
-            stroke="#22c55e"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6 }}
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#F0F4F0"
+            vertical={false}
           />
-          <Line
-            type="monotone"
-            dataKey="Gorduras"
-            stroke="#f59e0b"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6 }}
+          <XAxis
+            dataKey="date"
+            tick={{ fontSize: 11, fill: "#9CA3AF" }}
+            axisLine={false}
+            tickLine={false}
           />
-          <Line
-            type="monotone"
-            dataKey="Carboidratos"
-            stroke="#3b82f6"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6 }}
+          <YAxis
+            tick={{ fontSize: 11, fill: "#9CA3AF" }}
+            unit="g"
+            axisLine={false}
+            tickLine={false}
           />
-        </LineChart>
+          <Tooltip
+            contentStyle={{
+              borderRadius: "12px",
+              border: "none",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+            }}
+            formatter={(v: number | string) => `${v}g`}
+          />
+          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Bar dataKey="Proteína" fill="#22c55e" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Gorduras" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Carboidratos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );

@@ -5,6 +5,7 @@ import { getRedis } from '@/lib/redis'
 
 const BodySchema = z.object({
   nome: z.string().min(2),
+  unidade: z.enum(['g', 'ml']).default('g'),
 })
 
 const MacrosSchema = z.object({
@@ -17,8 +18,8 @@ type Macros = z.infer<typeof MacrosSchema>
 
 const ESTIMATE_TTL = 60 * 60 * 24 * 30 // 30 dias
 
-function estimateCacheKey(nome: string) {
-  return `diet:estimate:${nome.toLowerCase().trim()}`
+function estimateCacheKey(nome: string, unidade: string) {
+  return `diet:estimate:${nome.toLowerCase().trim()}:${unidade}`
 }
 
 export async function POST(request: Request) {
@@ -32,18 +33,18 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { nome } = BodySchema.parse(body)
+    const { nome, unidade } = BodySchema.parse(body)
 
     // Tenta retornar do cache antes de chamar a IA
     const redis = getRedis()
-    const cached = await redis.get<Macros>(estimateCacheKey(nome))
+    const cached = await redis.get<Macros>(estimateCacheKey(nome, unidade))
     if (cached) {
       return NextResponse.json(cached)
     }
 
     const ai = new GoogleGenAI({ apiKey })
     const prompt =
-      `Você é um nutricionista. Dado o alimento "${nome}", retorne os macronutrientes médios por 100g ` +
+      `Você é um nutricionista. Dado o alimento "${nome}", retorne os macronutrientes médios por 100${unidade} ` +
       `no formato: {"proteina": number, "gorduras": number, "carboidratos": number}`
 
     const response = await ai.models.generateContent({
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     }
 
     // Salva no cache para evitar chamadas repetidas
-    await redis.set(estimateCacheKey(nome), macros, { ex: ESTIMATE_TTL })
+    await redis.set(estimateCacheKey(nome, unidade), macros, { ex: ESTIMATE_TTL })
 
     return NextResponse.json(macros)
   } catch (error) {

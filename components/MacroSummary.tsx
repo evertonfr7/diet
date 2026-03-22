@@ -6,59 +6,115 @@ type Props = {
   totals: MacroTotals;
 };
 
-function MacroCard({
-  label,
+const TARGETS = {
+  calorias: 2400,
+  proteina: 200,
+  carboidratos: 300,
+  gorduras: 100,
+};
+
+function ProgressBar({
   value,
-  unit,
+  max,
   colorClass,
 }: {
-  label: string;
   value: number;
-  unit: string;
+  max: number;
   colorClass: string;
 }) {
+  const pct = Math.min(100, Math.round((value / max) * 100));
   return (
-    <div
-      className={`bg-white rounded-xl border ${colorClass} p-4 flex flex-col items-center gap-1`}
-    >
-      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        {label}
-      </span>
-      <span className="text-2xl font-bold text-gray-900">
-        {Math.round(value)}
-      </span>
-      <span className="text-xs text-gray-400">{unit}</span>
+    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
+      <div
+        className={`h-full rounded-full transition-all ${colorClass}`}
+        style={{ width: `${pct}%` }}
+      />
     </div>
   );
 }
 
 export default function MacroSummary({ totals }: Props) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <MacroCard
-        label="Calorias"
-        value={totals.calorias}
-        unit="kcal"
-        colorClass="border-orange-200"
-      />
-      <MacroCard
-        label="Proteína"
-        value={totals.proteina}
-        unit="g"
-        colorClass="border-green-200"
-      />
-      <MacroCard
-        label="Gorduras"
-        value={totals.gorduras}
-        unit="g"
-        colorClass="border-amber-200"
-      />
-      <MacroCard
-        label="Carboidratos"
-        value={totals.carboidratos}
-        unit="g"
-        colorClass="border-blue-200"
-      />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Calorias — destaque */}
+      <div className="sm:col-span-2 lg:col-span-1 bg-white rounded-2xl shadow-sm p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          Gasto Energético
+        </p>
+        <div className="flex items-end gap-1.5 mt-1">
+          <span className="text-4xl font-bold text-[#1A3A2A]">
+            {Math.round(totals.calorias).toLocaleString("pt-BR")}
+          </span>
+          <span className="text-sm text-gray-400 mb-1">
+            / {TARGETS.calorias.toLocaleString("pt-BR")} kcal
+          </span>
+        </div>
+        <ProgressBar
+          value={totals.calorias}
+          max={TARGETS.calorias}
+          colorClass="bg-green-500"
+        />
+      </div>
+
+      {/* Proteína */}
+      <div className="bg-white rounded-2xl shadow-sm p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 flex items-center gap-1">
+          <span>🥩</span> Proteína
+        </p>
+        <div className="flex items-end gap-1 mt-1">
+          <span className="text-2xl font-bold text-gray-900">
+            {Math.round(totals.proteina)}g
+          </span>
+          <span className="text-xs text-gray-400 mb-0.5">
+            of {TARGETS.proteina}g
+          </span>
+        </div>
+        <ProgressBar
+          value={totals.proteina}
+          max={TARGETS.proteina}
+          colorClass="bg-blue-500"
+        />
+      </div>
+
+      {/* Carboidratos */}
+      <div className="bg-white rounded-2xl shadow-sm p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 flex items-center gap-1">
+          <span>🌾</span> Carboidratos
+        </p>
+        <div className="flex items-end gap-1 mt-1">
+          <span className="text-2xl font-bold text-gray-900">
+            {Math.round(totals.carboidratos)}g
+          </span>
+          <span className="text-xs text-gray-400 mb-0.5">
+            of {TARGETS.carboidratos}g
+          </span>
+        </div>
+        <ProgressBar
+          value={totals.carboidratos}
+          max={TARGETS.carboidratos}
+          colorClass="bg-amber-400"
+        />
+      </div>
+
+      {/* Gorduras */}
+      <div className="bg-white rounded-2xl shadow-sm p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 flex items-center gap-1">
+          <span>🫒</span> Gorduras
+        </p>
+        <div className="flex items-end gap-1 mt-1">
+          <span className="text-2xl font-bold text-gray-900">
+            {Math.round(totals.gorduras)}g
+          </span>
+          <span className="text-xs text-gray-400 mb-0.5">
+            of {TARGETS.gorduras}g
+          </span>
+        </div>
+        <ProgressBar
+          value={totals.gorduras}
+          max={TARGETS.gorduras}
+          colorClass="bg-orange-400"
+        />
+      </div>
     </div>
   );
 }

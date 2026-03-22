@@ -28,6 +28,7 @@ export default function AddItemModal({
   const [error, setError] = useState("");
 
   const selectedFood = foods.find((f) => f.id === alimentoId);
+  const unidade = selectedFood?.unidade ?? "g";
   const qty = parseFloat(quantidade) || 0;
   const preview =
     selectedFood && qty > 0
@@ -90,7 +91,7 @@ export default function AddItemModal({
                   {foods.map((f) => (
                     <option key={f.id} value={f.id}>
                       {f.nome} (P:{f.proteina}g · G:{f.gorduras}g · C:
-                      {f.carboidratos}g / 100g)
+                      {f.carboidratos}g / 100{f.unidade ?? "g"})
                     </option>
                   ))}
                 </select>
@@ -98,21 +99,25 @@ export default function AddItemModal({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantidade (g)
+                  Quantidade ({unidade})
                 </label>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {[30, 50, 100, 150, 200, 300].map((g) => (
+                  {(unidade === "ml"
+                    ? [100, 150, 200, 250, 330, 500]
+                    : [30, 50, 100, 150, 200, 300]
+                  ).map((v) => (
                     <button
-                      key={g}
+                      key={v}
                       type="button"
-                      onClick={() => setQuantidade(String(g))}
+                      onClick={() => setQuantidade(String(v))}
                       className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
-                        quantidade === String(g)
+                        quantidade === String(v)
                           ? "bg-green-600 text-white"
                           : "bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700"
                       }`}
                     >
-                      {g}g
+                      {v}
+                      {unidade}
                     </button>
                   ))}
                 </div>

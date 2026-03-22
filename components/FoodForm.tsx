@@ -33,6 +33,7 @@ export default function FoodForm({ onSuccess }: Props) {
     gorduras: "",
     carboidratos: "",
   });
+  const [unidade, setUnidade] = useState<"g" | "ml">("g");
   const [loading, setLoading] = useState(false);
   const [estimating, setEstimating] = useState(false);
   const [error, setError] = useState("");
@@ -56,7 +57,7 @@ export default function FoodForm({ onSuccess }: Props) {
       const res = await fetch("/api/foods/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: form.nome.trim() }),
+        body: JSON.stringify({ nome: form.nome.trim(), unidade }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -85,6 +86,7 @@ export default function FoodForm({ onSuccess }: Props) {
       proteina: parseFloat(form.proteina) || 0,
       gorduras: parseFloat(form.gorduras) || 0,
       carboidratos: parseFloat(form.carboidratos) || 0,
+      unidade,
     };
     if (!payload.nome) return;
     setLoading(true);
@@ -99,6 +101,7 @@ export default function FoodForm({ onSuccess }: Props) {
       const food: Food = await res.json();
       onSuccess(food);
       setForm({ nome: "", proteina: "", gorduras: "", carboidratos: "" });
+      setUnidade("g");
       setOpen(false);
     } catch {
       setError("Erro ao salvar alimento. Tente novamente.");
@@ -111,7 +114,7 @@ export default function FoodForm({ onSuccess }: Props) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-sm text-green-700 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+        className="text-sm bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-xl font-semibold transition-colors"
       >
         + Novo alimento
       </button>
@@ -147,7 +150,26 @@ export default function FoodForm({ onSuccess }: Props) {
             />
           </div>
 
-          <p className="text-xs text-gray-400">Macros por 100g do alimento:</p>
+          <div className="flex gap-2">
+            {(["g", "ml"] as const).map((u) => (
+              <button
+                key={u}
+                type="button"
+                onClick={() => setUnidade(u)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  unidade === u
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700"
+                }`}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-xs text-gray-400">
+            Macros por 100{unidade} do alimento:
+          </p>
 
           <div className="flex justify-end">
             <button

@@ -85,6 +85,7 @@ export async function POST(request: Request) {
           proteina: food.proteina * ratio,
           gorduras: food.gorduras * ratio,
           carboidratos: food.carboidratos * ratio,
+          unidade: (food.unidade ?? 'g') as 'g' | 'ml',
         }
         meal.itens.push(item)
         await saveDayData(date, dayData)

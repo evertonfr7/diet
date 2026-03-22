@@ -7,6 +7,7 @@ const FoodSchema = z.object({
   proteina: z.number().min(0),
   gorduras: z.number().min(0),
   carboidratos: z.number().min(0),
+  unidade: z.enum(['g', 'ml']).default('g'),
 })
 
 export async function GET() {

@@ -4,6 +4,7 @@ export type Food = {
   proteina: number
   gorduras: number
   carboidratos: number
+  unidade: 'g' | 'ml'
 }
 
 export type MealItem = {
@@ -14,6 +15,7 @@ export type MealItem = {
   proteina: number
   gorduras: number
   carboidratos: number
+  unidade: 'g' | 'ml'
 }
 
 export type Meal = {

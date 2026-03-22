@@ -206,30 +206,37 @@ export default function DayView() {
     );
   }
 
+  // Greeting based on time of day
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Bom dia." : hour < 18 ? "Boa tarde." : "Boa noite.";
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Hoje</h1>
-          <p className="text-sm text-gray-500 capitalize">{today}</p>
+          <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
+            {greeting}
+          </h1>
+          <p className="text-sm text-gray-500 capitalize mt-0.5">{today}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <FoodForm onSuccess={(food) => setFoods((f) => [...f, food])} />
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
-            {syncing ? "Sincronizando..." : "↕ Sincronizar dia"}
+            {syncing ? "Sincronizando..." : "↕ Sincronizar"}
           </button>
+          <FoodForm onSuccess={(food) => setFoods((f) => [...f, food])} />
         </div>
       </div>
 
       {/* Sync message */}
       {syncMessage && (
         <div
-          className={`px-4 py-3 rounded-lg text-sm font-medium ${
+          className={`px-4 py-3 rounded-2xl text-sm font-medium ${
             syncMessage.type === "success"
               ? "bg-green-50 text-green-700 border border-green-200"
               : "bg-red-50 text-red-700 border border-red-200"
@@ -241,7 +248,7 @@ export default function DayView() {
 
       {/* Mutation error */}
       {mutationError && (
-        <div className="px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200 flex items-center justify-between">
+        <div className="px-4 py-3 rounded-2xl text-sm font-medium bg-red-50 text-red-700 border border-red-200 flex items-center justify-between">
           <span>{mutationError}</span>
           <button
             onClick={() => setMutationError("")}
@@ -256,10 +263,18 @@ export default function DayView() {
       {/* Macro Summary */}
       <MacroSummary totals={totals} />
 
+      {/* Protocol section */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          Protocolo do Dia
+        </h2>
+        <span className="text-xs text-gray-400">{today}</span>
+      </div>
+
       {/* Meals */}
       <div className="space-y-3">
         {dayData.refeicoes.length === 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
+          <div className="bg-white rounded-2xl shadow-sm p-8 text-center text-gray-400">
             <p>Nenhuma refeição registrada hoje.</p>
             <p className="text-sm mt-1">
               Adicione uma refeição abaixo para começar.

@@ -13,6 +13,7 @@ model Food {
   proteina     Float
   gorduras     Float
   carboidratos Float
+  unidade      String @default("g")
 }
 
 model DailySummary {
