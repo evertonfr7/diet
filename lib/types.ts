@@ -1,0 +1,42 @@
+export type Food = {
+  id: number
+  nome: string
+  proteina: number
+  gorduras: number
+  carboidratos: number
+}
+
+export type MealItem = {
+  id: string
+  alimentoId: number
+  nome: string
+  quantidade: number
+  proteina: number
+  gorduras: number
+  carboidratos: number
+}
+
+export type Meal = {
+  id: string
+  nome: string
+  itens: MealItem[]
+}
+
+export type DayData = {
+  refeicoes: Meal[]
+}
+
+export type DailySummary = {
+  id: number
+  date: string
+  proteina: number
+  gorduras: number
+  carboidratos: number
+}
+
+export type MacroTotals = {
+  proteina: number
+  gorduras: number
+  carboidratos: number
+  calorias: number
+}
