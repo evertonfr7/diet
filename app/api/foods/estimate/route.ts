@@ -1,5 +1,10 @@
+// Provedor de IA configurável via variáveis de ambiente:
+//   AI_BASE_URL  — ex: https://api.groq.com/openai/v1
+//   AI_API_KEY   — chave do provedor (Groq, OpenRouter, etc.)
+//   AI_MODEL     — ex: llama-3.3-70b-versatile
+
 import { NextResponse } from 'next/server'
-import { GoogleGenAI } from '@google/genai'
+import OpenAI from 'openai'
 import { z } from 'zod'
 import { getRedis } from '@/lib/redis'
 
@@ -22,11 +27,17 @@ function estimateCacheKey(nome: string, unidade: string) {
   return `diet:estimate:${nome.toLowerCase().trim()}:${unidade}`
 }
 
+/** Remove blocos ```json ... ``` que alguns modelos inserem mesmo quando não deviam. */
+function extractJson(raw: string): string {
+  const match = raw.match(/```(?:json)?\s*([\s\S]*?)```/)
+  return match ? match[1].trim() : raw.trim()
+}
+
 export async function POST(request: Request) {
-  const apiKey = process.env.GOOGLE_AI_API_KEY
-  if (!apiKey) {
+  const { AI_BASE_URL, AI_API_KEY, AI_MODEL } = process.env
+  if (!AI_BASE_URL || !AI_API_KEY || !AI_MODEL) {
     return NextResponse.json(
-      { error: 'GOOGLE_AI_API_KEY não configurada.' },
+      { error: 'Variáveis de ambiente AI_BASE_URL, AI_API_KEY e AI_MODEL não configuradas.' },
       { status: 500 },
     )
   }
@@ -42,19 +53,21 @@ export async function POST(request: Request) {
       return NextResponse.json(cached)
     }
 
-    const ai = new GoogleGenAI({ apiKey })
-    const prompt =
-      `Você é um nutricionista. Dado o alimento "${nome}", retorne os macronutrientes médios por 100${unidade} ` +
-      `no formato: {"proteina": number, "gorduras": number, "carboidratos": number}`
+    const ai = new OpenAI({ baseURL: AI_BASE_URL, apiKey: AI_API_KEY })
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      config: { responseMimeType: 'application/json' },
+    const prompt =
+      `Você é um nutricionista. Dado o alimento "${nome}", retorne APENAS um JSON com os macronutrientes médios por 100${unidade}. ` +
+      `Responda estritamente no formato: {"proteina": number, "gorduras": number, "carboidratos": number}. ` +
+      `Sem texto adicional, sem blocos de código, apenas o JSON.`
+
+    const completion = await ai.chat.completions.create({
+      model: AI_MODEL,
+      response_format: { type: 'json_object' },
+      messages: [{ role: 'user', content: prompt }],
     })
 
-    const text = (response.text ?? '').trim()
-    if (!text) {
+    const raw = (completion.choices[0]?.message?.content ?? '').trim()
+    if (!raw) {
       console.error('[estimate] resposta vazia da IA')
       return NextResponse.json(
         { error: 'Não foi possível estimar. Preencha manualmente.' },
@@ -64,9 +77,9 @@ export async function POST(request: Request) {
 
     let parsed: unknown
     try {
-      parsed = JSON.parse(text)
+      parsed = JSON.parse(extractJson(raw))
     } catch {
-      console.error('[estimate] JSON inválido na resposta:', text)
+      console.error('[estimate] JSON inválido na resposta:', raw)
       return NextResponse.json(
         { error: 'Não foi possível estimar. Preencha manualmente.' },
         { status: 422 },
@@ -89,10 +102,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(macros)
   } catch (error) {
-
-    console.log(error);
-
-
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 })
     }
@@ -100,8 +109,8 @@ export async function POST(request: Request) {
 
     const isRateLimit =
       msg.includes('429') ||
-      msg.toLowerCase().includes('rate') ||
-      msg.toLowerCase().includes('resource_exhausted') ||
+      msg.toLowerCase().includes('rate limit') ||
+      msg.toLowerCase().includes('too many requests') ||
       msg.toLowerCase().includes('quota')
     if (isRateLimit) {
       return NextResponse.json(
