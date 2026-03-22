@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import type { DayData, Food, MacroTotals, MacroTargets } from "@/lib/types";
+import type {
+  DayData,
+  Food,
+  Meal,
+  MacroTotals,
+  MacroTargets,
+} from "@/lib/types";
 import MacroSummary from "./MacroSummary";
 import MealSection from "./MealSection";
 import AddMealForm from "./AddMealForm";
