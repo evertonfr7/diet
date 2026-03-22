@@ -42,3 +42,10 @@ export type MacroTotals = {
   carboidratos: number
   calorias: number
 }
+
+export type MacroTargets = {
+  calorias: number
+  proteina: number
+  carboidratos: number
+  gorduras: number
+}

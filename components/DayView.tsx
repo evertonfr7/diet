@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import type { DayData, Food, MacroTotals } from "@/lib/types";
+import type { DayData, Food, MacroTotals, MacroTargets } from "@/lib/types";
 import MacroSummary from "./MacroSummary";
 import MealSection from "./MealSection";
 import AddMealForm from "./AddMealForm";
@@ -29,9 +29,17 @@ function calcTotals(dayData: DayData): MacroTotals {
 
 type SyncMessage = { type: "success" | "error"; text: string };
 
+const DEFAULT_TARGETS: MacroTargets = {
+  calorias: 2400,
+  proteina: 200,
+  carboidratos: 300,
+  gorduras: 100,
+};
+
 export default function DayView() {
   const [dayData, setDayData] = useState<DayData>({ refeicoes: [] });
   const [foods, setFoods] = useState<Food[]>([]);
+  const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -51,16 +59,21 @@ export default function DayView() {
 
   const fetchAll = useCallback(async () => {
     try {
-      const [dayRes, foodsRes] = await Promise.all([
+      const [dayRes, foodsRes, settingsRes] = await Promise.all([
         fetch("/api/day"),
         fetch("/api/foods"),
+        fetch("/api/settings"),
       ]);
-      const [day, foodsList] = await Promise.all([
+      const [day, foodsList, settingsData] = await Promise.all([
         dayRes.json(),
         foodsRes.json(),
+        settingsRes.json(),
       ]);
       setDayData(day);
       setFoods(foodsList);
+      if (settingsData && !settingsData.error) {
+        setTargets(settingsData);
+      }
     } catch {
       setLoadError(
         "Erro ao carregar dados. Verifique as variáveis de ambiente.",
@@ -261,7 +274,7 @@ export default function DayView() {
       )}
 
       {/* Macro Summary */}
-      <MacroSummary totals={totals} />
+      <MacroSummary totals={totals} targets={targets} />
 
       {/* Protocol section */}
       <div className="flex items-center justify-between">

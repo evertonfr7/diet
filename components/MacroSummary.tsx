@@ -1,16 +1,10 @@
 "use client";
 
-import type { MacroTotals } from "@/lib/types";
+import type { MacroTotals, MacroTargets } from "@/lib/types";
 
 type Props = {
   totals: MacroTotals;
-};
-
-const TARGETS = {
-  calorias: 2400,
-  proteina: 200,
-  carboidratos: 300,
-  gorduras: 100,
+  targets: MacroTargets;
 };
 
 function ProgressBar({
@@ -33,7 +27,7 @@ function ProgressBar({
   );
 }
 
-export default function MacroSummary({ totals }: Props) {
+export default function MacroSummary({ totals, targets }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Calorias — destaque */}
@@ -46,12 +40,12 @@ export default function MacroSummary({ totals }: Props) {
             {Math.round(totals.calorias).toLocaleString("pt-BR")}
           </span>
           <span className="text-sm text-gray-400 mb-1">
-            / {TARGETS.calorias.toLocaleString("pt-BR")} kcal
+            / {targets.calorias.toLocaleString("pt-BR")} kcal
           </span>
         </div>
         <ProgressBar
           value={totals.calorias}
-          max={TARGETS.calorias}
+          max={targets.calorias}
           colorClass="bg-green-500"
         />
       </div>
@@ -66,12 +60,12 @@ export default function MacroSummary({ totals }: Props) {
             {Math.round(totals.proteina)}g
           </span>
           <span className="text-xs text-gray-400 mb-0.5">
-            of {TARGETS.proteina}g
+            of {targets.proteina}g
           </span>
         </div>
         <ProgressBar
           value={totals.proteina}
-          max={TARGETS.proteina}
+          max={targets.proteina}
           colorClass="bg-blue-500"
         />
       </div>
@@ -86,12 +80,12 @@ export default function MacroSummary({ totals }: Props) {
             {Math.round(totals.carboidratos)}g
           </span>
           <span className="text-xs text-gray-400 mb-0.5">
-            of {TARGETS.carboidratos}g
+            of {targets.carboidratos}g
           </span>
         </div>
         <ProgressBar
           value={totals.carboidratos}
-          max={TARGETS.carboidratos}
+          max={targets.carboidratos}
           colorClass="bg-amber-400"
         />
       </div>
@@ -106,12 +100,12 @@ export default function MacroSummary({ totals }: Props) {
             {Math.round(totals.gorduras)}g
           </span>
           <span className="text-xs text-gray-400 mb-0.5">
-            of {TARGETS.gorduras}g
+            of {targets.gorduras}g
           </span>
         </div>
         <ProgressBar
           value={totals.gorduras}
-          max={TARGETS.gorduras}
+          max={targets.gorduras}
           colorClass="bg-orange-400"
         />
       </div>

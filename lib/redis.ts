@@ -3,6 +3,8 @@ import { Redis } from '@upstash/redis'
 // TTL de 7 dias para dados do dia no Redis
 export const DAY_TTL = 60 * 60 * 24 * 7
 
+export const SETTINGS_KEY = 'diet:settings'
+
 let _redis: Redis | null = null
 
 export function getRedis(): Redis {
