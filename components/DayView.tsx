@@ -13,6 +13,7 @@ import MealSection from "./MealSection";
 import AddMealForm from "./AddMealForm";
 import AddItemModal from "./AddItemModal";
 import FoodForm from "./FoodForm";
+import ParseMealModal from "./ParseMealModal";
 
 function calcTotals(dayData: DayData): MacroTotals {
   let proteina = 0,
@@ -52,6 +53,11 @@ export default function DayView() {
   const [syncMessage, setSyncMessage] = useState<SyncMessage | null>(null);
   const [mutationError, setMutationError] = useState("");
   const [addItemModal, setAddItemModal] = useState<{
+    mealId: string;
+    mealName: string;
+  } | null>(null);
+
+  const [parseMealModal, setParseMealModal] = useState<{
     mealId: string;
     mealName: string;
   } | null>(null);
@@ -203,6 +209,66 @@ export default function DayView() {
     }
     const food: Food = await res.json();
     setFoods((f) => [...f, food]);
+  }
+
+  type ParsedItem = {
+    nome: string;
+    quantidade: number;
+    unidade: "g" | "ml";
+    proteina: number;
+    gorduras: number;
+    carboidratos: number;
+  };
+
+  async function handleAddBulk(mealId: string, itens: ParsedItem[]) {
+    setMutationError("");
+    const res = await fetch("/api/day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "addItemsBulk", mealId, itens }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setMutationError(data.error ?? "Erro ao adicionar itens.");
+      return;
+    }
+    const newItems = await res.json();
+    setDayData((d) => ({
+      ...d,
+      refeicoes: d.refeicoes.map((m) =>
+        m.id === mealId ? { ...m, itens: [...m.itens, ...newItems] } : m,
+      ),
+    }));
+  }
+
+  type ParsedItem = {
+    nome: string;
+    quantidade: number;
+    unidade: "g" | "ml";
+    proteina: number;
+    gorduras: number;
+    carboidratos: number;
+  };
+
+  async function handleAddBulk(mealId: string, itens: ParsedItem[]) {
+    setMutationError("");
+    const res = await fetch("/api/day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "addItemsBulk", mealId, itens }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setMutationError(data.error ?? "Erro ao adicionar itens.");
+      return;
+    }
+    const newItems = await res.json();
+    setDayData((d) => ({
+      ...d,
+      refeicoes: d.refeicoes.map((m) =>
+        m.id === mealId ? { ...m, itens: [...m.itens, ...newItems] } : m,
+      ),
+    }));
   }
 
   async function handleRemoveMeal(mealId: string) {
@@ -357,6 +423,9 @@ export default function DayView() {
             onAddItem={(mealId) =>
               setAddItemModal({ mealId, mealName: meal.nome })
             }
+            onParseMeal={(mealId) =>
+              setParseMealModal({ mealId, mealName: meal.nome })
+            }
             onRemoveItem={handleRemoveItem}
             onRemoveMeal={handleRemoveMeal}
             onSaveAsFood={handleSaveAsFood}
@@ -373,6 +442,15 @@ export default function DayView() {
           foods={foods}
           onAdd={handleAddItem}
           onClose={() => setAddItemModal(null)}
+        />
+      )}
+
+      {parseMealModal && (
+        <ParseMealModal
+          mealId={parseMealModal.mealId}
+          mealName={parseMealModal.mealName}
+          onAdd={handleAddBulk}
+          onClose={() => setParseMealModal(null)}
         />
       )}
     </div>

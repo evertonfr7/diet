@@ -45,11 +45,27 @@ const RemoveMealSchema = z.object({
   mealId: z.string(),
 })
 
+const BulkItemSchema = z.object({
+  nome: z.string().min(1),
+  quantidade: z.number().positive(),
+  unidade: z.enum(['g', 'ml']),
+  proteina: z.number().min(0),
+  gorduras: z.number().min(0),
+  carboidratos: z.number().min(0),
+})
+
+const AddItemsBulkSchema = z.object({
+  action: z.literal('addItemsBulk'),
+  mealId: z.string(),
+  itens: z.array(BulkItemSchema).min(1),
+})
+
 const ActionSchema = z.discriminatedUnion('action', [
   AddMealSchema,
   AddItemSchema,
   RemoveItemSchema,
   RemoveMealSchema,
+  AddItemsBulkSchema,
 ])
 
 export async function POST(request: Request) {
@@ -106,6 +122,26 @@ export async function POST(request: Request) {
         dayData.refeicoes = dayData.refeicoes.filter((m) => m.id !== action.mealId)
         await saveDayData(date, dayData)
         return NextResponse.json({ ok: true })
+      }
+
+      case 'addItemsBulk': {
+        const meal = dayData.refeicoes.find((m) => m.id === action.mealId)
+        if (!meal) {
+          return NextResponse.json({ error: 'Refeição não encontrada' }, { status: 404 })
+        }
+        const newItems: MealItem[] = action.itens.map((i) => ({
+          id: randomUUID(),
+          alimentoId: 0,
+          nome: i.nome,
+          quantidade: i.quantidade,
+          unidade: i.unidade,
+          proteina: i.proteina,
+          gorduras: i.gorduras,
+          carboidratos: i.carboidratos,
+        }))
+        meal.itens.push(...newItems)
+        await saveDayData(date, dayData)
+        return NextResponse.json(newItems, { status: 201 })
       }
     }
   } catch (error) {

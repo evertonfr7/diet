@@ -6,6 +6,7 @@ import type { Meal } from "@/lib/types";
 type Props = {
   meal: Meal;
   onAddItem: (mealId: string) => void;
+  onParseMeal: (mealId: string) => void;
   onRemoveItem: (mealId: string, itemId: string) => void;
   onRemoveMeal: (mealId: string) => void;
   onSaveAsFood: (meal: Meal) => Promise<void>;
@@ -14,6 +15,7 @@ type Props = {
 export default function MealSection({
   meal,
   onAddItem,
+  onParseMeal,
   onRemoveItem,
   onRemoveMeal,
   onSaveAsFood,
@@ -55,6 +57,13 @@ export default function MealSection({
             className="text-xs border border-green-200 text-green-700 hover:bg-green-50 px-3 py-1.5 rounded-xl font-medium transition-colors"
           >
             + Alimento
+          </button>
+          <button
+            onClick={() => onParseMeal(meal.id)}
+            className="text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-3 py-1.5 rounded-xl font-medium transition-colors"
+            title="Adicionar refeição por descrição em texto"
+          >
+            ✨ por texto
           </button>
           <button
             onClick={handleSave}
