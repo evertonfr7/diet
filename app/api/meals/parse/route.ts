@@ -40,7 +40,14 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { descricao } = BodySchema.parse(body)
 
-    const ai = new OpenAI({ baseURL: AI_BASE_URL, apiKey: AI_API_KEY })
+    const ai = new OpenAI({
+      baseURL: AI_BASE_URL,
+      apiKey: AI_API_KEY,
+      defaultHeaders: {
+        'HTTP-Referer': process.env.AI_HTTP_REFERER || 'http://localhost:3000',
+        'X-Title': process.env.AI_X_TITLE || 'Diet App',
+      },
+    })
 
     const prompt =
       `Você é um nutricionista. O usuário descreveu uma refeição: "${descricao}". ` +

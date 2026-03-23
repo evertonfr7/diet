@@ -53,7 +53,14 @@ export async function POST(request: Request) {
       return NextResponse.json(cached)
     }
 
-    const ai = new OpenAI({ baseURL: AI_BASE_URL, apiKey: AI_API_KEY })
+    const ai = new OpenAI({
+      baseURL: AI_BASE_URL,
+      apiKey: AI_API_KEY,
+      defaultHeaders: {
+        'HTTP-Referer': process.env.AI_HTTP_REFERER || 'http://localhost:3000',
+        'X-Title': process.env.AI_X_TITLE || 'Diet App',
+      },
+    })
 
     const prompt =
       `Você é um nutricionista. Dado o alimento "${nome}", retorne APENAS um JSON com os macronutrientes médios por 100${unidade}. ` +
