@@ -180,8 +180,10 @@ export default function FoodForm({ onSuccess }: Props) {
               disabled={estimating || form.nome.trim().length < 2}
               className="text-xs text-purple-700 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-40"
             >
-              {estimating ? "Estimando..." : (
-                <span className="flex items-center gap-1">
+              {estimating ? (
+                "Estimando..."
+              ) : (
+                <span className="flex items-center gap-1 justify-center">
                   <Sparkles size={11} strokeWidth={2} />
                   Estimar com IA
                 </span>

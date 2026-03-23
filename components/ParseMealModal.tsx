@@ -210,12 +210,14 @@ export default function ParseMealModal({
                 disabled={estimating || descricao.trim().length < 3}
                 className="flex-1 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
               >
-                {estimating ? "Estimando..." : (
-                <span className="flex items-center gap-1.5">
-                  <Sparkles size={13} strokeWidth={2} />
-                  Estimar com IA
-                </span>
-              )}
+                {estimating ? (
+                  "Estimando..."
+                ) : (
+                  <span className="flex items-center gap-1.5 justify-center">
+                    <Sparkles size={13} strokeWidth={2} />
+                    Estimar com IA
+                  </span>
+                )}
               </button>
             </>
           ) : (
