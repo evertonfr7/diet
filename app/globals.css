@@ -9,4 +9,8 @@
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     background-color: #F4F7F5;
   }
+
+  button, [role="button"], a {
+    cursor: pointer;
+  }
 }

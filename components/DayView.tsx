@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { RefreshCw, X } from "lucide-react";
 import type {
   DayData,
   Food,
@@ -14,6 +15,41 @@ import AddMealForm from "./AddMealForm";
 import AddItemModal from "./AddItemModal";
 import FoodForm from "./FoodForm";
 import ParseMealModal from "./ParseMealModal";
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div className="h-9 w-40 bg-gray-200 rounded-lg" />
+          <div className="h-4 w-56 bg-gray-100 rounded mt-2" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-9 w-28 bg-gray-200 rounded-xl" />
+          <div className="h-9 w-32 bg-gray-200 rounded-xl" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className={`${i === 0 ? "col-span-2 lg:col-span-1" : ""} bg-white rounded-2xl shadow-sm p-5`}>
+            <div className="h-3 w-20 bg-gray-100 rounded mb-3" />
+            <div className="h-8 w-24 bg-gray-200 rounded" />
+            <div className="h-2 w-full bg-gray-100 rounded-full mt-3" />
+          </div>
+        ))}
+      </div>
+      <div className="h-4 w-32 bg-gray-100 rounded" />
+      <div className="space-y-3">
+        {[...Array(2)].map((_, i) => (
+          <div key={i} className="bg-white rounded-2xl shadow-sm p-5">
+            <div className="h-5 w-36 bg-gray-200 rounded mb-2" />
+            <div className="h-4 w-48 bg-gray-100 rounded" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function calcTotals(dayData: DayData): MacroTotals {
   let proteina = 0,
@@ -292,11 +328,7 @@ export default function DayView() {
   const totals = calcTotals(dayData);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <span className="text-gray-400">Carregando...</span>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (loadError) {
@@ -328,7 +360,10 @@ export default function DayView() {
             disabled={syncing}
             className="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
-            {syncing ? "Sincronizando..." : "↕ Sincronizar"}
+            <span className="flex items-center gap-1.5">
+              <RefreshCw size={14} strokeWidth={2} className={syncing ? "animate-spin" : ""} />
+              {syncing ? "Sincronizando..." : "Sincronizar"}
+            </span>
           </button>
           <FoodForm onSuccess={(food) => setFoods((f) => [...f, food])} />
         </div>
@@ -356,7 +391,7 @@ export default function DayView() {
             className="text-red-400 hover:text-red-600 ml-3"
             aria-label="Fechar"
           >
-            ✕
+            <X size={14} strokeWidth={2} />
           </button>
         </div>
       )}
@@ -371,11 +406,10 @@ export default function DayView() {
       />
 
       {/* Protocol section */}
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
           Protocolo do Dia
         </h2>
-        <span className="text-xs text-gray-400">{today}</span>
       </div>
 
       {/* Meals */}

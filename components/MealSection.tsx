@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X, Sparkles, Save, Check } from "lucide-react";
 import type { Meal } from "@/lib/types";
 
 type Props = {
@@ -42,7 +43,7 @@ export default function MealSection({
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Meal header */}
       <div className="px-4 pt-4 pb-3">
-        {/* Linha 1: nome + ✕ */}
+        {/* Linha 1: nome + X */}
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 text-base leading-snug">
@@ -60,7 +61,7 @@ export default function MealSection({
             className="text-gray-300 hover:text-red-400 transition-colors p-1 ml-2 flex-shrink-0"
             aria-label="Remover refeição"
           >
-            ✕
+            <X size={15} strokeWidth={2} />
           </button>
         </div>
         {/* Linha 2: botões de ação */}
@@ -73,18 +74,31 @@ export default function MealSection({
           </button>
           <button
             onClick={() => onParseMeal(meal.id)}
-            className="flex-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors"
             title="Adicionar refeição por descrição em texto"
           >
-            ✨ por texto
+            <Sparkles size={11} strokeWidth={2} />
+            por texto
           </button>
           <button
             onClick={handleSave}
             disabled={saving || meal.itens.length === 0}
-            className="flex-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors disabled:opacity-40"
+            className="flex-1 flex items-center justify-center gap-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors disabled:opacity-40"
             title="Salvar refeição como alimento"
           >
-            {savedOk ? "✓ Salvo" : saving ? "..." : "💾 Salvar"}
+            {savedOk ? (
+              <>
+                <Check size={11} strokeWidth={2.5} />
+                Salvo
+              </>
+            ) : saving ? (
+              "..."
+            ) : (
+              <>
+                <Save size={11} strokeWidth={2} />
+                Salvar
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -101,7 +115,7 @@ export default function MealSection({
             );
             return (
               <li key={item.id} className="px-4 py-3">
-                {/* Linha 1: nome + ✕ */}
+                {/* Linha 1: nome + X */}
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
                     <span className="text-sm font-medium text-gray-800">
@@ -114,10 +128,10 @@ export default function MealSection({
                   </div>
                   <button
                     onClick={() => onRemoveItem(meal.id, item.id)}
-                    className="text-gray-300 hover:text-red-400 transition-colors ml-2 flex-shrink-0"
+                    className="text-gray-300 hover:text-red-400 transition-colors ml-2 flex-shrink-0 p-0.5"
                     aria-label="Remover alimento"
                   >
-                    ✕
+                    <X size={14} strokeWidth={2} />
                   </button>
                 </div>
                 {/* Linha 2: badges de macros */}
@@ -125,10 +139,10 @@ export default function MealSection({
                   <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-medium">
                     P {Math.round(item.proteina)}g
                   </span>
-                  <span className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md font-medium">
+                  <span className="bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-md font-medium">
                     G {Math.round(item.gorduras)}g
                   </span>
-                  <span className="bg-green-50 text-green-600 px-1.5 py-0.5 rounded-md font-medium">
+                  <span className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md font-medium">
                     C {Math.round(item.carboidratos)}g
                   </span>
                   <span className="text-gray-400 ml-0.5">{itemKcal} kcal</span>

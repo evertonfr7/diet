@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 
 export default function PwaSetup() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -183,7 +184,7 @@ export default function PwaSetup() {
           className="text-green-400 hover:text-white transition-colors flex-shrink-0 p-1"
           aria-label="Fechar"
         >
-          ✕
+          <X size={16} strokeWidth={2} />
         </button>
       </div>
     </div>

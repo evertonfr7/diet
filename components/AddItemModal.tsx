@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X } from "lucide-react";
 import type { Food } from "@/lib/types";
 
 type Props = {
@@ -62,9 +63,10 @@ export default function AddItemModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+            className="text-gray-400 hover:text-gray-600 p-0.5"
+            aria-label="Fechar"
           >
-            ✕
+            <X size={16} strokeWidth={2} />
           </button>
         </div>
 

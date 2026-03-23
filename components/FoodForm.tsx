@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X, Sparkles, AlertTriangle } from "lucide-react";
 import type { Food } from "@/lib/types";
 
 type Props = {
@@ -128,9 +129,10 @@ export default function FoodForm({ onSuccess }: Props) {
           <h2 className="font-semibold text-gray-900">Cadastrar alimento</h2>
           <button
             onClick={() => setOpen(false)}
-            className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+            className="text-gray-400 hover:text-gray-600 p-0.5"
+            aria-label="Fechar"
           >
-            ✕
+            <X size={16} strokeWidth={2} />
           </button>
         </div>
 
@@ -178,7 +180,12 @@ export default function FoodForm({ onSuccess }: Props) {
               disabled={estimating || form.nome.trim().length < 2}
               className="text-xs text-purple-700 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-40"
             >
-              {estimating ? "Estimando..." : "✨ Estimar com IA"}
+              {estimating ? "Estimando..." : (
+                <span className="flex items-center gap-1">
+                  <Sparkles size={11} strokeWidth={2} />
+                  Estimar com IA
+                </span>
+              )}
             </button>
           </div>
 
@@ -202,8 +209,9 @@ export default function FoodForm({ onSuccess }: Props) {
           </div>
 
           {allZero && (
-            <p className="text-xs text-amber-500">
-              ⚠ Todos os macros estão zerados. Confirme se está correto.
+            <p className="text-xs text-amber-500 flex items-center gap-1">
+              <AlertTriangle size={12} strokeWidth={2} />
+              Todos os macros estão zerados. Confirme se está correto.
             </p>
           )}
 

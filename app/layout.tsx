@@ -28,8 +28,8 @@ export default function RootLayout({
       <body className="bg-[#F4F7F5] min-h-screen">
         <PwaSetup />
         <Sidebar />
-        {/* offset for mobile top bar */}
-        <div className="pt-14 lg:pt-0 lg:pl-60">
+        {/* offset for mobile top bar + bottom nav */}
+        <div className="pt-14 pb-16 lg:pt-0 lg:pb-0 lg:pl-60">
           <main className="max-w-5xl mx-auto px-4 py-8">{children}</main>
         </div>
       </body>

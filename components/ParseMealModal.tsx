@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X, Sparkles, ChevronLeft } from "lucide-react";
 
 type ParsedItem = {
   nome: string;
@@ -89,17 +90,18 @@ export default function ParseMealModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
-            <h2 className="font-semibold text-gray-900">
-              ✨ Refeição por texto
+            <h2 className="font-semibold text-gray-900 flex items-center gap-1.5">
+              <Sparkles size={14} className="text-purple-500" strokeWidth={2} />
+              Refeição por texto
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">{mealName}</p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-300 hover:text-gray-500 transition-colors text-xl leading-none"
+            className="text-gray-300 hover:text-gray-500 transition-colors p-0.5"
             aria-label="Fechar"
           >
-            ✕
+            <X size={16} strokeWidth={2} />
           </button>
         </div>
 
@@ -165,18 +167,18 @@ export default function ParseMealModal({
                         <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-medium">
                           P {Math.round(item.proteina)}g
                         </span>
-                        <span className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md font-medium">
+                        <span className="bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-md font-medium">
                           G {Math.round(item.gorduras)}g
                         </span>
-                        <span className="bg-green-50 text-green-600 px-1.5 py-0.5 rounded-md font-medium">
+                        <span className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md font-medium">
                           C {Math.round(item.carboidratos)}g
                         </span>
                         <button
                           onClick={() => handleRemoveItem(idx)}
-                          className="text-gray-300 hover:text-red-400 transition-colors ml-1"
+                          className="text-gray-300 hover:text-red-400 transition-colors ml-1 p-0.5"
                           aria-label="Remover item"
                         >
-                          ✕
+                          <X size={13} strokeWidth={2} />
                         </button>
                       </div>
                     </li>
@@ -208,16 +210,22 @@ export default function ParseMealModal({
                 disabled={estimating || descricao.trim().length < 3}
                 className="flex-1 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
               >
-                {estimating ? "Estimando..." : "✨ Estimar com IA"}
+                {estimating ? "Estimando..." : (
+                <span className="flex items-center gap-1.5">
+                  <Sparkles size={13} strokeWidth={2} />
+                  Estimar com IA
+                </span>
+              )}
               </button>
             </>
           ) : (
             <>
               <button
                 onClick={() => setItens(null)}
-                className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
               >
-                ← Redigitar
+                <ChevronLeft size={14} strokeWidth={2} />
+                Redigitar
               </button>
               <button
                 onClick={handleConfirm}
