@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { X } from "lucide-react";
 import type { Food } from "@/lib/types";
 
@@ -27,6 +27,21 @@ export default function AddItemModal({
   const [quantidade, setQuantidade] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+
+  // Função para normalizar texto (remover acentos e case-insensitive)
+  function normalize(str: string) {
+    return str
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
+  }
+
+  const filteredFoods = useMemo(() => {
+    if (!search.trim()) return foods;
+    const s = normalize(search);
+    return foods.filter((f) => normalize(f.nome).includes(s));
+  }, [foods, search]);
 
   const selectedFood = foods.find((f) => f.id === alimentoId);
   const unidade = selectedFood?.unidade ?? "g";
@@ -77,6 +92,21 @@ export default function AddItemModal({
             </p>
           ) : (
             <>
+              {/* Campo de busca */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Buscar alimento
+                </label>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Digite para buscar..."
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 mb-2"
+                  autoFocus
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Alimento
@@ -90,12 +120,18 @@ export default function AddItemModal({
                   required
                 >
                   <option value="">Selecione...</option>
-                  {foods.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.nome} (P:{f.proteina}g · G:{f.gorduras}g · C:
-                      {f.carboidratos}g / 100{f.unidade ?? "g"})
+                  {filteredFoods.length === 0 ? (
+                    <option disabled value="">
+                      Nenhum alimento encontrado
                     </option>
-                  ))}
+                  ) : (
+                    filteredFoods.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.nome} (P:{f.proteina}g · G:{f.gorduras}g · C:
+                        {f.carboidratos}g / 100{f.unidade ?? "g"})
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
