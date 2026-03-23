@@ -38,6 +38,82 @@ export default function PwaSetup() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(display-mode: standalone)").matches) return;
+
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    function getTodayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    async function runAutoSync() {
+      const today = getTodayStr();
+      if (localStorage.getItem("auto-sync-date") === today) return;
+
+      let success = false;
+      let noMeals = false;
+      try {
+        const res = await fetch("/api/sync", { method: "POST" });
+        if (res.ok) {
+          success = true;
+        } else if (res.status === 400) {
+          noMeals = true;
+        }
+      } catch {
+        // network error — success stays false
+      }
+
+      // Only mark as synced when there's nothing left to do (data saved or no meals to save).
+      // On network/server error, leave the guard unset so a retry can still show the warning.
+      if (success || noMeals) {
+        localStorage.setItem("auto-sync-date", today);
+      }
+
+      const reg = await navigator.serviceWorker?.ready.catch(() => null);
+      reg?.active?.postMessage({ type: "AUTO_SYNC_RESULT", success, noMeals });
+
+      scheduleNext();
+    }
+
+    function scheduleNext() {
+      const now = new Date();
+      const target = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        23,
+        59,
+        0,
+        0,
+      );
+      const msUntil = target.getTime() - now.getTime();
+      if (msUntil <= 0) {
+        // already past 23:59 today — schedule for 23:59 tomorrow
+        target.setDate(target.getDate() + 1);
+        timeoutId = setTimeout(runAutoSync, target.getTime() - Date.now());
+      } else {
+        timeoutId = setTimeout(runAutoSync, msUntil);
+      }
+    }
+
+    // If already past 23:59 and haven't synced today, run immediately
+    const now = new Date();
+    const isPast2359 = now.getHours() === 23 && now.getMinutes() >= 59;
+    const today = getTodayStr();
+    if (isPast2359 && localStorage.getItem("auto-sync-date") !== today) {
+      runAutoSync();
+    } else {
+      scheduleNext();
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
     function setup() {
       if (timerRef.current) {
         clearInterval(timerRef.current);

@@ -11,6 +11,28 @@ self.addEventListener('message', (event) => {
       renotify: true,
     })
   }
+
+  if (event.data?.type === 'AUTO_SYNC_RESULT') {
+    const { success, noMeals } = event.data
+    if (noMeals) return
+    if (success) {
+      self.registration.showNotification('✅ Diário sincronizado!', {
+        body: 'Dados do dia salvos com sucesso.',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        tag: 'auto-sync',
+        renotify: true,
+      }).catch(() => { })
+    } else {
+      self.registration.showNotification('⚠️ Falha ao sincronizar automaticamente', {
+        body: 'Abra o app e sincronize manualmente.',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        tag: 'auto-sync',
+        renotify: true,
+      }).catch(() => { })
+    }
+  }
 })
 
 self.addEventListener('push', (event) => {
