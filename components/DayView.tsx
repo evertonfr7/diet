@@ -276,6 +276,8 @@ export default function DayView() {
           text: "Dia sincronizado com sucesso! Refeições resetadas.",
         });
         setDayData({ refeicoes: [] });
+        setWaterIntake(0);
+        localStorage.removeItem(`water-intake-${todayKey}`);
       }
     } catch {
       setSyncMessage({
