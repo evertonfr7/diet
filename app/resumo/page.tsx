@@ -75,9 +75,9 @@ export default async function ResumoPage() {
 
             <div className="space-y-3">
               {[
-                { label: "Proteína", pct: protPct, color: "bg-blue-400" },
+                { label: "Proteína", pct: protPct, color: "bg-green-400" },
                 { label: "Gorduras", pct: gordPct, color: "bg-amber-400" },
-                { label: "Carboidratos", pct: carbPct, color: "bg-green-400" },
+                { label: "Carboidratos", pct: carbPct, color: "bg-blue-400" },
               ].map(({ label, pct, color }) => (
                 <div key={label}>
                   <div className="flex justify-between text-xs text-green-200 mb-1">
