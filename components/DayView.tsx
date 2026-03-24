@@ -15,6 +15,7 @@ import AddMealForm from "./AddMealForm";
 import AddItemModal from "./AddItemModal";
 import FoodForm from "./FoodForm";
 import ParseMealModal from "./ParseMealModal";
+import { FALLBACK_WATER_GOAL } from "@/lib/types";
 
 function DashboardSkeleton() {
   return (
@@ -31,7 +32,10 @@ function DashboardSkeleton() {
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className={`${i === 0 ? "col-span-2 lg:col-span-1" : ""} bg-white rounded-2xl shadow-sm p-5`}>
+          <div
+            key={i}
+            className={`${i === 0 ? "col-span-2 lg:col-span-1" : ""} bg-white rounded-2xl shadow-sm p-5`}
+          >
             <div className="h-3 w-20 bg-gray-100 rounded mb-3" />
             <div className="h-8 w-24 bg-gray-200 rounded" />
             <div className="h-2 w-full bg-gray-100 rounded-full mt-3" />
@@ -129,17 +133,7 @@ export default function DayView() {
     if (storedIntake) setWaterIntake(Number(storedIntake));
   }, [todayKey]);
 
-  useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setTargets(mapSettingsToTargets(data));
-          setWaterGoal(data.waterGoal ?? 2000);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  // Removed duplicate useEffect for fetching settings
 
   function addWater(ml: number) {
     setWaterIntake((prev) => {
@@ -164,7 +158,8 @@ export default function DayView() {
       setDayData(day);
       setFoods(foodsList);
       if (settingsData && !settingsData.error) {
-        setTargets(settingsData);
+        setTargets(mapSettingsToTargets(settingsData));
+        setWaterGoal(settingsData.waterGoal ?? FALLBACK_WATER_GOAL);
       }
     } catch {
       setLoadError(
@@ -385,7 +380,11 @@ export default function DayView() {
             className="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             <span className="flex items-center gap-1.5">
-              <RefreshCw size={14} strokeWidth={2} className={syncing ? "animate-spin" : ""} />
+              <RefreshCw
+                size={14}
+                strokeWidth={2}
+                className={syncing ? "animate-spin" : ""}
+              />
               {syncing ? "Sincronizando..." : "Sincronizar"}
             </span>
           </button>

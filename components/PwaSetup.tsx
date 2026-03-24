@@ -124,18 +124,24 @@ export default function PwaSetup() {
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
 
-      let notifEnabled = localStorage.getItem("water-notif-enabled") === "true";
-      let notifInterval = Number(localStorage.getItem("water-notif-interval") || 30);
 
+      let notifEnabled: boolean | null = null;
+      let notifInterval: number | null = null;
       try {
         const res = await fetch("/api/settings");
         const data = await res.json();
         if (data && !data.error) {
-          notifEnabled = data.waterNotifEnabled ?? notifEnabled;
-          notifInterval = data.waterNotifInterval ?? notifInterval;
+          if (typeof data.waterNotifEnabled === "boolean") notifEnabled = data.waterNotifEnabled;
+          if (typeof data.waterNotifInterval === "number") notifInterval = data.waterNotifInterval;
         }
       } catch {
-        // Use localStorage fallback
+        // fallback to localStorage below
+      }
+      if (notifEnabled === null) {
+        notifEnabled = localStorage.getItem("water-notif-enabled") === "true";
+      }
+      if (notifInterval === null) {
+        notifInterval = Number(localStorage.getItem("water-notif-interval") || 30);
       }
 
       if (!notifEnabled) return;

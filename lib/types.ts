@@ -1,3 +1,11 @@
+export const FALLBACK_TARGETS: MacroTargets = {
+  calorias: 2000,
+  proteina: 150,
+  carboidratos: 250,
+  gorduras: 70,
+};
+
+export const FALLBACK_WATER_GOAL = 2000;
 export type Food = {
   id: number
   nome: string

@@ -2,6 +2,7 @@
 
 import { Flame, Beef, Wheat, Droplets, GlassWater } from "lucide-react";
 import type { MacroTotals, MacroTargets } from "@/lib/types";
+import { FALLBACK_TARGETS } from "@/lib/types";
 
 type Props = {
   totals: MacroTotals;
@@ -43,12 +44,7 @@ export default function MacroSummary({
   waterGoal,
   onAddWater,
 }: Props) {
-  const safeTargets = {
-    calorias: targets?.calorias ?? 2000,
-    proteina: targets?.proteina ?? 150,
-    carboidratos: targets?.carboidratos ?? 250,
-    gorduras: targets?.gorduras ?? 70,
-  };
+  const safeTargets: MacroTargets = targets || FALLBACK_TARGETS;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

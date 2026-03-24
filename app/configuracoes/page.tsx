@@ -41,9 +41,14 @@ export default function ConfiguracoesPage() {
       .then((data) => {
         if (data && !data.error) {
           setForm(data);
-          localStorage.setItem("water-goal", String(data.waterGoal));
-          localStorage.setItem("water-notif-enabled", String(data.waterNotifEnabled));
-          localStorage.setItem("water-notif-interval", String(data.waterNotifInterval));
+          localStorage.setItem(
+            "water-notif-enabled",
+            String(data.waterNotifEnabled),
+          );
+          localStorage.setItem(
+            "water-notif-interval",
+            String(data.waterNotifInterval),
+          );
         }
       })
       .catch(() => {})
@@ -53,10 +58,9 @@ export default function ConfiguracoesPage() {
   function handleChange<K extends keyof Settings>(key: K) {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!form) return;
-      const value = key === "waterNotifEnabled" 
-        ? e.target.checked 
-        : Number(e.target.value);
-      setForm((f) => f ? { ...f, [key]: value } : null);
+      const value =
+        key === "waterNotifEnabled" ? e.target.checked : Number(e.target.value);
+      setForm((f) => (f ? { ...f, [key]: value } : null));
       setMessage(null);
     };
   }
@@ -158,7 +162,6 @@ export default function ConfiguracoesPage() {
     const val = Math.max(100, Number(e.target.value));
     const updatedForm = { ...form, waterGoal: val };
     setForm(updatedForm);
-    localStorage.setItem("water-goal", String(val));
   }
 
   async function handleSave(data?: Settings) {
@@ -179,7 +182,10 @@ export default function ConfiguracoesPage() {
           text: resData.error ?? "Erro ao salvar configurações.",
         });
       } else {
-        setMessage({ type: "success", text: "Configurações salvas com sucesso!" });
+        setMessage({
+          type: "success",
+          text: "Configurações salvas com sucesso!",
+        });
       }
     } catch {
       setMessage({ type: "error", text: "Erro ao salvar. Tente novamente." });
@@ -189,10 +195,30 @@ export default function ConfiguracoesPage() {
   }
 
   const MACRO_FIELDS = [
-    { key: "calorieTarget" as const, label: "Calorias", unit: "kcal", color: "focus:ring-green-500" },
-    { key: "proteinTarget" as const, label: "Proteínas", unit: "g", color: "focus:ring-blue-500" },
-    { key: "carbTarget" as const, label: "Carboidratos", unit: "g", color: "focus:ring-amber-400" },
-    { key: "fatTarget" as const, label: "Gorduras", unit: "g", color: "focus:ring-orange-400" },
+    {
+      key: "calorieTarget" as const,
+      label: "Calorias",
+      unit: "kcal",
+      color: "focus:ring-green-500",
+    },
+    {
+      key: "proteinTarget" as const,
+      label: "Proteínas",
+      unit: "g",
+      color: "focus:ring-blue-500",
+    },
+    {
+      key: "carbTarget" as const,
+      label: "Carboidratos",
+      unit: "g",
+      color: "focus:ring-amber-400",
+    },
+    {
+      key: "fatTarget" as const,
+      label: "Gorduras",
+      unit: "g",
+      color: "focus:ring-orange-400",
+    },
   ];
 
   return (
@@ -213,7 +239,15 @@ export default function ConfiguracoesPage() {
 
         {loading || !form ? (
           <div className="space-y-4">
-            {[...MACRO_FIELDS, { key: "waterGoal" as const, label: "Água", unit: "ml", color: "" }].map(({ key }) => (
+            {[
+              ...MACRO_FIELDS,
+              {
+                key: "waterGoal" as const,
+                label: "Água",
+                unit: "ml",
+                color: "",
+              },
+            ].map(({ key }) => (
               <div
                 key={key}
                 className="h-16 bg-gray-100 rounded-xl animate-pulse"
@@ -299,51 +333,55 @@ export default function ConfiguracoesPage() {
               Notificações bloqueadas no navegador. Acesse as configurações do
               site para desbloquear.
             </p>
-          ) : form && (
-            <>
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  Lembretes ativos
-                </label>
-                <button
-                  type="button"
-                  onClick={() => toggleNotif(!form.waterNotifEnabled)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    form.waterNotifEnabled ? "bg-cyan-500" : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      form.waterNotifEnabled ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {form.waterNotifEnabled && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Intervalo entre lembretes{" "}
-                    <span className="text-xs text-gray-400 ml-1">
-                      (minutos)
-                    </span>
+          ) : (
+            form && (
+              <>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">
+                    Lembretes ativos
                   </label>
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={form.waterNotifInterval}
-                    onChange={handleNotifIntervalChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
-                  />
-                  <p className="text-xs text-gray-400 mt-1.5">
-                    {pushSubscribed
-                      ? `Lembrete a cada ${form.waterNotifInterval} min, mesmo com o app fechado. ✅`
-                      : `Lembrete a cada ${form.waterNotifInterval} min enquanto o app estiver aberto.`}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => toggleNotif(!form.waterNotifEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      form.waterNotifEnabled ? "bg-cyan-500" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        form.waterNotifEnabled
+                          ? "translate-x-6"
+                          : "translate-x-1"
+                      }`}
+                    />
+                  </button>
                 </div>
-              )}
-            </>
+
+                {form.waterNotifEnabled && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Intervalo entre lembretes{" "}
+                      <span className="text-xs text-gray-400 ml-1">
+                        (minutos)
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={form.waterNotifInterval}
+                      onChange={handleNotifIntervalChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
+                    />
+                    <p className="text-xs text-gray-400 mt-1.5">
+                      {pushSubscribed
+                        ? `Lembrete a cada ${form.waterNotifInterval} min, mesmo com o app fechado. ✅`
+                        : `Lembrete a cada ${form.waterNotifInterval} min enquanto o app estiver aberto.`}
+                    </p>
+                  </div>
+                )}
+              </>
+            )
           )}
         </div>
       </div>
