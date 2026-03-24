@@ -2,15 +2,20 @@ import { db } from "@/lib/db";
 import MacroChart from "@/components/MacroChart";
 import type { SyncRecord } from "@/lib/types";
 
+type SyncRecordWithAgua = SyncRecord & {
+  agua: number;
+  dailySummary: { date: string };
+};
+
 export default async function ResumoPage() {
-  const records = await db.syncRecord.findMany({
+  const records = (await db.syncRecord.findMany({
     include: {
       dailySummary: {
         select: { date: true },
       },
     },
     orderBy: { syncedAt: "asc" },
-  });
+  })) as SyncRecordWithAgua[];
 
   const chartData = records.map((r) => ({
     id: r.id,
@@ -19,6 +24,7 @@ export default async function ResumoPage() {
     proteina: r.proteina,
     gorduras: r.gorduras,
     carboidratos: r.carboidratos,
+    agua: r.agua ?? 0,
   }));
 
   const avg =
@@ -28,14 +34,16 @@ export default async function ResumoPage() {
             proteina: acc.proteina + r.proteina,
             gorduras: acc.gorduras + r.gorduras,
             carboidratos: acc.carboidratos + r.carboidratos,
+            agua: acc.agua + (r.agua ?? 0),
           }),
-          { proteina: 0, gorduras: 0, carboidratos: 0 },
+          { proteina: 0, gorduras: 0, carboidratos: 0, agua: 0 },
         )
       : null;
 
   const avgProteina = avg ? avg.proteina / records.length : 0;
   const avgGorduras = avg ? avg.gorduras / records.length : 0;
   const avgCarboidratos = avg ? avg.carboidratos / records.length : 0;
+  const avgAgua = avg ? avg.agua / records.length : 0;
   const avgKcal = avgProteina * 4 + avgCarboidratos * 4 + avgGorduras * 9;
 
   const protPct =
@@ -78,7 +86,7 @@ export default async function ResumoPage() {
             </p>
             <p className="text-green-300 text-sm mb-6">kcal / dia</p>
 
-            <div className="space-y-3">
+            <div className="space-y-3 mb-4">
               {[
                 { label: "Proteína", pct: protPct, color: "bg-green-400" },
                 { label: "Gorduras", pct: gordPct, color: "bg-amber-400" },
@@ -97,6 +105,13 @@ export default async function ResumoPage() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="flex items-center gap-2 text-green-200 text-xs">
+              <span>Água média:</span>
+              <span className="font-bold text-white">
+                {Math.round(avgAgua).toLocaleString("pt-BR")}
+              </span>
+              <span>ml / dia</span>
             </div>
           </div>
 

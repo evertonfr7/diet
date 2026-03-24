@@ -34,17 +34,19 @@ export async function POST() {
       create: { date },
     })
 
+    const agua = dayData.agua ?? 0
     const record = await db.syncRecord.create({
       data: {
         dailySummaryId: summary.id,
         proteina,
         gorduras,
         carboidratos,
-      },
+        agua,
+      } as any,
     })
 
-    // Reseta as refeições do dia no Redis (mantém chave com array vazio)
-    await redis.set(getDayKey(date), { refeicoes: [] }, { ex: DAY_TTL })
+    // Reseta as refeições e água do dia no Redis (mantém chave com array vazio e agua 0)
+    await redis.set(getDayKey(date), { refeicoes: [], agua: 0 }, { ex: DAY_TTL })
 
     return NextResponse.json(record)
   } catch (error) {

@@ -8,7 +8,7 @@ import type { DayData, Meal, MealItem } from '@/lib/types'
 async function getDayData(date: string): Promise<DayData> {
   const redis = getRedis()
   const data = await redis.get<DayData>(getDayKey(date))
-  return data ?? { refeicoes: [] }
+  return data ?? { refeicoes: [], agua: 0 }
 }
 
 async function saveDayData(date: string, data: DayData): Promise<void> {
@@ -60,12 +60,24 @@ const AddItemsBulkSchema = z.object({
   itens: z.array(BulkItemSchema).min(1),
 })
 
+const AddWaterSchema = z.object({
+  action: z.literal('addWater'),
+  ml: z.number().int().positive(),
+})
+
+const SetWaterSchema = z.object({
+  action: z.literal('setWater'),
+  ml: z.number().int().min(0),
+})
+
 const ActionSchema = z.discriminatedUnion('action', [
   AddMealSchema,
   AddItemSchema,
   RemoveItemSchema,
   RemoveMealSchema,
   AddItemsBulkSchema,
+  AddWaterSchema,
+  SetWaterSchema,
 ])
 
 export async function POST(request: Request) {
@@ -76,6 +88,19 @@ export async function POST(request: Request) {
     const dayData = await getDayData(date)
 
     switch (action.action) {
+      case 'addWater': {
+        const dayData = await getDayData(date)
+        const updated = { ...dayData, agua: (dayData.agua ?? 0) + action.ml }
+        await saveDayData(date, updated)
+        return NextResponse.json({ success: true, agua: updated.agua })
+      }
+
+      case 'setWater': {
+        const dayData = await getDayData(date)
+        const updated = { ...dayData, agua: action.ml }
+        await saveDayData(date, updated)
+        return NextResponse.json({ success: true, agua: updated.agua })
+      }
       case 'addMeal': {
         const meal: Meal = { id: randomUUID(), nome: action.nome, itens: [] }
         dayData.refeicoes.push(meal)

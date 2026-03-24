@@ -34,6 +34,7 @@ export type Meal = {
 
 export type DayData = {
   refeicoes: Meal[]
+  agua: number // ml totais do dia, padrão 0
 }
 
 export type DailySummary = {
@@ -47,6 +48,7 @@ export type SyncRecord = {
   proteina: number
   gorduras: number
   carboidratos: number
+  agua: number // ml ingeridos no dia
   syncedAt: Date
   dailySummary: {
     date: string

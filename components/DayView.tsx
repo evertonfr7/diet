@@ -98,7 +98,7 @@ function mapSettingsToTargets(settings: {
 }
 
 export default function DayView() {
-  const [dayData, setDayData] = useState<DayData>({ refeicoes: [] });
+  const [dayData, setDayData] = useState<DayData>({ refeicoes: [], agua: 0 });
   const [foods, setFoods] = useState<Food[]>([]);
   const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS);
   const [loading, setLoading] = useState(true);
@@ -128,18 +128,43 @@ export default function DayView() {
 
   const todayKey = new Date().toLocaleDateString("en-CA");
 
+  // Migração localStorage → Redis (compatibilidade retroativa)
   useEffect(() => {
-    const storedIntake = localStorage.getItem(`water-intake-${todayKey}`);
-    if (storedIntake) setWaterIntake(Number(storedIntake));
+    async function migrateWater() {
+      try {
+        const dayRes = await fetch(`/api/day?date=${todayKey}`);
+        const dayData = await dayRes.json();
+        if ((dayData.agua ?? 0) === 0) {
+          const localWater = localStorage.getItem(`water-intake-${todayKey}`);
+          if (localWater && Number(localWater) > 0) {
+            const ml = Number(localWater);
+            await fetch("/api/day", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "setWater", ml, date: todayKey }),
+            });
+            setWaterIntake(ml);
+            localStorage.removeItem(`water-intake-${todayKey}`);
+            return;
+          }
+        }
+        setWaterIntake(dayData.agua ?? 0);
+      } catch {
+        setWaterIntake(0);
+      }
+    }
+    migrateWater();
   }, [todayKey]);
 
   // Removed duplicate useEffect for fetching settings
 
-  function addWater(ml: number) {
-    setWaterIntake((prev) => {
-      const next = prev + ml;
-      localStorage.setItem(`water-intake-${todayKey}`, String(next));
-      return next;
+  // Atualização otimista + API
+  async function addWater(ml: number) {
+    setWaterIntake((prev) => prev + ml);
+    await fetch("/api/day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "addWater", ml, date: todayKey }),
     });
   }
 
@@ -330,9 +355,8 @@ export default function DayView() {
           type: "success",
           text: "Dia sincronizado com sucesso! Refeições resetadas.",
         });
-        setDayData({ refeicoes: [] });
+        setDayData({ refeicoes: [], agua: 0 });
         setWaterIntake(0);
-        localStorage.removeItem(`water-intake-${todayKey}`);
       }
     } catch {
       setSyncMessage({
