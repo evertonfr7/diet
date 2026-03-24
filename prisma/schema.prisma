@@ -33,3 +33,14 @@ model SyncRecord {
   carboidratos   Float
   syncedAt       DateTime    @default(now())
 }
+
+model Settings {
+  id                 Int     @id @default(1)
+  waterGoal          Int     @default(2000)
+  waterNotifEnabled  Boolean @default(false)
+  waterNotifInterval Int     @default(30)
+  calorieTarget     Int     @default(2000)
+  proteinTarget     Int     @default(150)
+  carbTarget        Int     @default(250)
+  fatTarget         Int     @default(70)
+}

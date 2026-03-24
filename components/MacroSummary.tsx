@@ -43,6 +43,13 @@ export default function MacroSummary({
   waterGoal,
   onAddWater,
 }: Props) {
+  const safeTargets = {
+    calorias: targets?.calorias ?? 2000,
+    proteina: targets?.proteina ?? 150,
+    carboidratos: targets?.carboidratos ?? 250,
+    gorduras: targets?.gorduras ?? 70,
+  };
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
       {/* Calorias — hero card */}
@@ -58,7 +65,7 @@ export default function MacroSummary({
             {Math.round(totals.calorias).toLocaleString("pt-BR")}
           </span>
           <span className="text-sm text-green-300 mb-0.5">
-            / {targets.calorias.toLocaleString("pt-BR")}
+            / {safeTargets.calorias.toLocaleString("pt-BR")}
           </span>
         </div>
         <p className="text-[11px] text-green-400 mt-0.5">kcal</p>
@@ -66,7 +73,7 @@ export default function MacroSummary({
           <div
             className="h-full rounded-full bg-green-400 transition-all"
             style={{
-              width: `${targets.calorias > 0 ? Math.min(100, Math.round((totals.calorias / targets.calorias) * 100)) : 0}%`,
+              width: `${safeTargets.calorias > 0 ? Math.min(100, Math.round((totals.calorias / safeTargets.calorias) * 100)) : 0}%`,
             }}
           />
         </div>
@@ -85,12 +92,12 @@ export default function MacroSummary({
             {Math.round(totals.proteina)}g
           </span>
           <span className="text-xs text-gray-400 mb-0.5">
-            / {targets.proteina}g
+            / {safeTargets.proteina}g
           </span>
         </div>
         <ProgressBar
           value={totals.proteina}
-          max={targets.proteina}
+          max={safeTargets.proteina}
           colorClass="bg-blue-500"
         />
       </div>
@@ -108,12 +115,12 @@ export default function MacroSummary({
             {Math.round(totals.carboidratos)}g
           </span>
           <span className="text-xs text-gray-400 mb-0.5">
-            / {targets.carboidratos}g
+            / {safeTargets.carboidratos}g
           </span>
         </div>
         <ProgressBar
           value={totals.carboidratos}
-          max={targets.carboidratos}
+          max={safeTargets.carboidratos}
           colorClass="bg-amber-400"
         />
       </div>
@@ -131,12 +138,12 @@ export default function MacroSummary({
             {Math.round(totals.gorduras)}g
           </span>
           <span className="text-xs text-gray-400 mb-0.5">
-            / {targets.gorduras}g
+            / {safeTargets.gorduras}g
           </span>
         </div>
         <ProgressBar
           value={totals.gorduras}
-          max={targets.gorduras}
+          max={safeTargets.gorduras}
           colorClass="bg-orange-400"
         />
       </div>

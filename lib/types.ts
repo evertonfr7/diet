@@ -58,3 +58,14 @@ export type MacroTargets = {
   carboidratos: number
   gorduras: number
 }
+
+export type Settings = {
+  id: number
+  waterGoal: number
+  waterNotifEnabled: boolean
+  waterNotifInterval: number
+  calorieTarget: number
+  proteinTarget: number
+  carbTarget: number
+  fatTarget: number
+}

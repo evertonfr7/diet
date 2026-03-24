@@ -115,7 +115,7 @@ export default function PwaSetup() {
   }, []);
 
   useEffect(() => {
-    function setup() {
+    async function setup() {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -123,14 +123,25 @@ export default function PwaSetup() {
       if (typeof window === "undefined") return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
-      if (localStorage.getItem("water-notif-enabled") !== "true") return;
-      // Skip setInterval fallback when push subscription is active
+
+      let notifEnabled = localStorage.getItem("water-notif-enabled") === "true";
+      let notifInterval = Number(localStorage.getItem("water-notif-interval") || 30);
+
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        if (data && !data.error) {
+          notifEnabled = data.waterNotifEnabled ?? notifEnabled;
+          notifInterval = data.waterNotifInterval ?? notifInterval;
+        }
+      } catch {
+        // Use localStorage fallback
+      }
+
+      if (!notifEnabled) return;
       if (localStorage.getItem("push-subscribed") === "true") return;
 
-      const minutes = Number(
-        localStorage.getItem("water-notif-interval") || 30,
-      );
-      const ms = Math.max(1, minutes) * 60 * 1000;
+      const ms = Math.max(1, notifInterval) * 60 * 1000;
 
       timerRef.current = setInterval(async () => {
         const reg = await navigator.serviceWorker?.ready.catch(() => null);

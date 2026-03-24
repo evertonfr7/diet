@@ -79,6 +79,20 @@ const DEFAULT_TARGETS: MacroTargets = {
   gorduras: 100,
 };
 
+function mapSettingsToTargets(settings: {
+  calorieTarget: number;
+  proteinTarget: number;
+  carbTarget: number;
+  fatTarget: number;
+}): MacroTargets {
+  return {
+    calorias: settings.calorieTarget,
+    proteina: settings.proteinTarget,
+    carboidratos: settings.carbTarget,
+    gorduras: settings.fatTarget,
+  };
+}
+
 export default function DayView() {
   const [dayData, setDayData] = useState<DayData>({ refeicoes: [] });
   const [foods, setFoods] = useState<Food[]>([]);
@@ -112,10 +126,20 @@ export default function DayView() {
 
   useEffect(() => {
     const storedIntake = localStorage.getItem(`water-intake-${todayKey}`);
-    const storedGoal = localStorage.getItem("water-goal");
     if (storedIntake) setWaterIntake(Number(storedIntake));
-    if (storedGoal) setWaterGoal(Number(storedGoal));
   }, [todayKey]);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setTargets(mapSettingsToTargets(data));
+          setWaterGoal(data.waterGoal ?? 2000);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   function addWater(ml: number) {
     setWaterIntake((prev) => {
@@ -399,7 +423,7 @@ export default function DayView() {
       {/* Macro Summary */}
       <MacroSummary
         totals={totals}
-        targets={targets}
+        targets={targets ?? DEFAULT_TARGETS}
         waterIntake={waterIntake}
         waterGoal={waterGoal}
         onAddWater={addWater}
