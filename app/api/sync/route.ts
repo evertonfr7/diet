@@ -30,14 +30,23 @@ export async function POST() {
 
     const summary = await db.dailySummary.upsert({
       where: { date },
-      update: { proteina, gorduras, carboidratos },
-      create: { date, proteina, gorduras, carboidratos },
+      update: {},
+      create: { date },
+    })
+
+    const record = await db.syncRecord.create({
+      data: {
+        dailySummaryId: summary.id,
+        proteina,
+        gorduras,
+        carboidratos,
+      },
     })
 
     // Reseta as refeições do dia no Redis (mantém chave com array vazio)
     await redis.set(getDayKey(date), { refeicoes: [] }, { ex: DAY_TTL })
 
-    return NextResponse.json(summary)
+    return NextResponse.json(record)
   } catch (error) {
     console.error('Sync error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

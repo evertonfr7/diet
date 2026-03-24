@@ -10,15 +10,36 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { DailySummary } from "@/lib/types";
+
+type ChartDataPoint = {
+  id: number;
+  date: string;
+  syncedAt: Date;
+  proteina: number;
+  gorduras: number;
+  carboidratos: number;
+};
 
 type Props = {
-  data: DailySummary[];
+  data: ChartDataPoint[];
 };
+
+function formatDateTime(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const tz = process.env.NEXT_PUBLIC_TZ ?? 'UTC';
+  return d.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: tz,
+  });
+}
 
 export default function MacroChart({ data }: Props) {
   const chartData = data.map((d) => ({
-    date: d.date,
+    id: d.id,
+    date: formatDateTime(d.syncedAt),
     Proteína: Math.round(d.proteina),
     Gorduras: Math.round(d.gorduras),
     Carboidratos: Math.round(d.carboidratos),

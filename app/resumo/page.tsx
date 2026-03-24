@@ -1,34 +1,41 @@
 import { db } from "@/lib/db";
 import MacroChart from "@/components/MacroChart";
+import type { SyncRecord } from "@/lib/types";
 
 export default async function ResumoPage() {
-  const summaries = await db.dailySummary.findMany({
-    orderBy: { date: "asc" },
-    select: {
-      id: true,
-      date: true,
-      proteina: true,
-      gorduras: true,
-      carboidratos: true,
+  const records = await db.syncRecord.findMany({
+    include: {
+      dailySummary: {
+        select: { date: true },
+      },
     },
+    orderBy: { syncedAt: "asc" },
   });
 
-  // Compute averages for Macro Balance card
+  const chartData = records.map((r) => ({
+    id: r.id,
+    date: r.dailySummary.date,
+    syncedAt: r.syncedAt,
+    proteina: r.proteina,
+    gorduras: r.gorduras,
+    carboidratos: r.carboidratos,
+  }));
+
   const avg =
-    summaries.length > 0
-      ? summaries.reduce(
-          (acc, s) => ({
-            proteina: acc.proteina + s.proteina,
-            gorduras: acc.gorduras + s.gorduras,
-            carboidratos: acc.carboidratos + s.carboidratos,
+    records.length > 0
+      ? records.reduce(
+          (acc, r) => ({
+            proteina: acc.proteina + r.proteina,
+            gorduras: acc.gorduras + r.gorduras,
+            carboidratos: acc.carboidratos + r.carboidratos,
           }),
           { proteina: 0, gorduras: 0, carboidratos: 0 },
         )
       : null;
 
-  const avgProteina = avg ? avg.proteina / summaries.length : 0;
-  const avgGorduras = avg ? avg.gorduras / summaries.length : 0;
-  const avgCarboidratos = avg ? avg.carboidratos / summaries.length : 0;
+  const avgProteina = avg ? avg.proteina / records.length : 0;
+  const avgGorduras = avg ? avg.gorduras / records.length : 0;
+  const avgCarboidratos = avg ? avg.carboidratos / records.length : 0;
   const avgKcal = avgProteina * 4 + avgCarboidratos * 4 + avgGorduras * 9;
 
   const protPct =
@@ -40,7 +47,6 @@ export default async function ResumoPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page heading */}
       <div>
         <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
           Intelig&ecirc;ncia{" "}
@@ -51,7 +57,7 @@ export default async function ResumoPage() {
         </p>
       </div>
 
-      {summaries.length === 0 ? (
+      {records.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
           <p className="text-gray-400 text-lg">
             Nenhum dado sincronizado ainda.
@@ -63,7 +69,6 @@ export default async function ResumoPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Dark green Macro Balance card */}
           <div className="bg-[#1A3A2A] rounded-2xl p-6 text-white lg:col-span-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-green-300">
               Balan&ccedil;o M&eacute;dio
@@ -95,9 +100,8 @@ export default async function ResumoPage() {
             </div>
           </div>
 
-          {/* Bar chart */}
           <div className="lg:col-span-2">
-            <MacroChart data={summaries} />
+            <MacroChart data={chartData} />
           </div>
         </div>
       )}

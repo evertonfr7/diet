@@ -31,9 +31,18 @@ export type DayData = {
 export type DailySummary = {
   id: number
   date: string
+}
+
+export type SyncRecord = {
+  id: number
+  dailySummaryId: number
   proteina: number
   gorduras: number
   carboidratos: number
+  syncedAt: Date
+  dailySummary: {
+    date: string
+  }
 }
 
 export type MacroTotals = {
