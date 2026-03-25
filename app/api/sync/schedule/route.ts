@@ -24,8 +24,7 @@ async function qstashCreateSchedule(dest: string, cron: string, tz: string): Pro
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
-      'Upstash-Cron': cron,
-      'Upstash-Schedule-Timezone': tz,
+      'Upstash-Cron': `CRON_TZ=${tz} ${cron}`,
     },
   })
   if (!res.ok) {
