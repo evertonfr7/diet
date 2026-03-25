@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { Client } from '@upstash/qstash'
 import { getRedis, SYNC_SCHEDULE_ID_KEY } from '@/lib/redis'
 
+const SYNC_CRON = process.env.SYNC_CRON ?? '59 23 * * *'
+
+type StoredSchedule = { id: string; cron: string }
+
 function getQStashClient() {
   const token = process.env.QSTASH_TOKEN
   if (!token) throw new Error('QSTASH_TOKEN not configured.')
@@ -17,26 +21,31 @@ function getBaseUrl(): string {
 export async function POST() {
   try {
     const redis = getRedis()
+    const qstash = getQStashClient()
 
-    // Idempotent: return if schedule already exists
-    const existingId = await redis.get<string>(SYNC_SCHEDULE_ID_KEY)
-    if (existingId) {
-      return NextResponse.json({ ok: true, scheduleId: existingId, existing: true })
+    const stored = await redis.get<StoredSchedule>(SYNC_SCHEDULE_ID_KEY)
+
+    // Same cron already scheduled — nothing to do
+    if (stored?.cron === SYNC_CRON) {
+      return NextResponse.json({ ok: true, scheduleId: stored.id, existing: true })
     }
 
-    const qstash = getQStashClient()
+    // Cron changed (or no schedule yet) — delete old and create new
+    if (stored?.id) {
+      await qstash.schedules.delete(stored.id).catch(() => {})
+    }
 
     const dest = `${getBaseUrl()}/api/sync/background`
     const timezone = process.env.TZ_LOCAL ?? 'UTC'
 
     const { scheduleId } = await qstash.schedules.create({
       destination: dest,
-      cron: '12 02 * * *',
+      cron: SYNC_CRON,
       // @ts-expect-error — timezone is supported by QStash but not yet typed in the SDK
       timezone,
     })
 
-    await redis.set(SYNC_SCHEDULE_ID_KEY, scheduleId)
+    await redis.set(SYNC_SCHEDULE_ID_KEY, { id: scheduleId, cron: SYNC_CRON })
 
     return NextResponse.json({ ok: true, scheduleId })
   } catch (error) {
@@ -50,9 +59,9 @@ export async function DELETE() {
     const redis = getRedis()
     const qstash = getQStashClient()
 
-    const existingId = await redis.get<string>(SYNC_SCHEDULE_ID_KEY)
-    if (existingId) {
-      await qstash.schedules.delete(existingId).catch(() => { })
+    const stored = await redis.get<StoredSchedule>(SYNC_SCHEDULE_ID_KEY)
+    if (stored?.id) {
+      await qstash.schedules.delete(stored.id).catch(() => {})
       await redis.del(SYNC_SCHEDULE_ID_KEY)
     }
 

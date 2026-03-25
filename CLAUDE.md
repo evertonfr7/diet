@@ -27,7 +27,7 @@ No test suite is configured.
 
 - **Client → Redis (via API routes):** Daily meal state (7-day TTL) — fast read/write during the day
 - **Client → PostgreSQL (via API routes):** Foods, Settings, historical sync records (permanent)
-- **Auto-sync at 23:59:** `DayView` triggers `/api/sync` which persists daily macro totals from Redis to `SyncRecord` in PostgreSQL
+- **Auto-sync at 23:59 (configurável via `SYNC_CRON`):** QStash chama `/api/sync/background` que persiste os totais do dia do Redis para `SyncRecord` no PostgreSQL e reseta o Redis para o dia seguinte
 - **Water intake:** Stored only in `localStorage` (never synced to server)
 
 ### Key Directories
@@ -51,7 +51,7 @@ No test suite is configured.
 |---------|---------|--------------|
 | Upstash Redis | Daily meal cache + push subscriptions | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 | OpenRouter / Groq (OpenAI-compatible) | AI macro estimation + meal parsing | `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL` |
-| Upstash QStash | Serverless cron for push notifications | `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` |
+| Upstash QStash | Serverless cron for push notifications + daily sync | `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY`, `SYNC_CRON` |
 | Web Push (VAPID) | Push notification delivery | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` |
 | Neon / PostgreSQL | Persistent storage | `DATABASE_URL` |
 | `TZ_LOCAL` | Server timezone (e.g. `America/Sao_Paulo`) | Prevents midnight boundary bugs |
