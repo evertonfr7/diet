@@ -31,7 +31,7 @@ export async function POST() {
 
     const { scheduleId } = await qstash.schedules.create({
       destination: dest,
-      cron: '59 23 * * *',
+      cron: '06 02 * * *',
       // @ts-expect-error — timezone is supported by QStash but not yet typed in the SDK
       timezone,
     })
