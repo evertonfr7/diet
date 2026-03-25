@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import MacroChart from "@/components/MacroChart";
 import type { SyncRecord } from "@/lib/types";
+import { RefreshButton } from "@/components/RefreshButton";
 
 export const revalidate = 300; // revalida a cada 5 minutos
 
@@ -57,14 +58,17 @@ export default async function ResumoPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
-          Intelig&ecirc;ncia{" "}
-          <span className="text-green-600">Nutricional.</span>
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Hist&oacute;rico sincronizado de macronutrientes
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
+            Intelig&ecirc;ncia{" "}
+            <span className="text-green-600">Nutricional.</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Hist&oacute;rico sincronizado de macronutrientes
+          </p>
+        </div>
+        <RefreshButton />
       </div>
 
       {records.length === 0 ? (
