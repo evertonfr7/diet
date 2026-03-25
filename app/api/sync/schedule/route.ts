@@ -1,20 +1,15 @@
 import { NextResponse } from 'next/server'
-import { Client } from '@upstash/qstash'
 import { getRedis, SYNC_SCHEDULE_ID_KEY } from '@/lib/redis'
 
 const SYNC_CRON = process.env.SYNC_CRON ?? '59 23 * * *'
 const SYNC_TZ = process.env.TZ_LOCAL ?? 'UTC'
 
-console.log("sync_cron", SYNC_CRON);
-console.log("sync_tz", SYNC_TZ);
-
-
 type StoredSchedule = { id: string; cron: string; tz: string }
 
-function getQStashClient() {
+function getQStashToken() {
   const token = process.env.QSTASH_TOKEN
   if (!token) throw new Error('QSTASH_TOKEN not configured.')
-  return new Client({ token })
+  return token
 }
 
 function getBaseUrl(): string {
@@ -23,11 +18,35 @@ function getBaseUrl(): string {
   return url.startsWith('http') ? url : `https://${url}`
 }
 
+async function qstashCreateSchedule(dest: string, cron: string, tz: string): Promise<string> {
+  const token = getQStashToken()
+  const res = await fetch(`https://qstash.upstash.io/v2/schedules/${encodeURIComponent(dest)}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Upstash-Cron': cron,
+      'Upstash-Schedule-Timezone': tz,
+    },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`QStash error ${res.status}: ${text}`)
+  }
+  const data = await res.json() as { scheduleId: string }
+  return data.scheduleId
+}
+
+async function qstashDeleteSchedule(scheduleId: string): Promise<void> {
+  const token = getQStashToken()
+  await fetch(`https://qstash.upstash.io/v2/schedules/${scheduleId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  }).catch(() => {})
+}
+
 export async function POST() {
   try {
     const redis = getRedis()
-    const qstash = getQStashClient()
-
     const stored = await redis.get<StoredSchedule>(SYNC_SCHEDULE_ID_KEY)
 
     // Same cron + timezone already scheduled — nothing to do
@@ -37,17 +56,11 @@ export async function POST() {
 
     // Cron or timezone changed (or no schedule yet) — delete old and create new
     if (stored?.id) {
-      await qstash.schedules.delete(stored.id).catch(() => { })
+      await qstashDeleteSchedule(stored.id)
     }
 
     const dest = `${getBaseUrl()}/api/sync/background`
-
-    const { scheduleId } = await qstash.schedules.create({
-      destination: dest,
-      cron: SYNC_CRON,
-      // @ts-expect-error — timezone is supported by QStash but not yet typed in the SDK
-      timezone: SYNC_TZ,
-    })
+    const scheduleId = await qstashCreateSchedule(dest, SYNC_CRON, SYNC_TZ)
 
     await redis.set(SYNC_SCHEDULE_ID_KEY, { id: scheduleId, cron: SYNC_CRON, tz: SYNC_TZ })
 
@@ -61,14 +74,11 @@ export async function POST() {
 export async function DELETE() {
   try {
     const redis = getRedis()
-    const qstash = getQStashClient()
-
     const stored = await redis.get<StoredSchedule>(SYNC_SCHEDULE_ID_KEY)
     if (stored?.id) {
-      await qstash.schedules.delete(stored.id).catch(() => { })
+      await qstashDeleteSchedule(stored.id)
       await redis.del(SYNC_SCHEDULE_ID_KEY)
     }
-
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
