@@ -5,6 +5,10 @@ import { getRedis, SYNC_SCHEDULE_ID_KEY } from '@/lib/redis'
 const SYNC_CRON = process.env.SYNC_CRON ?? '59 23 * * *'
 const SYNC_TZ = process.env.TZ_LOCAL ?? 'UTC'
 
+console.log("sync_cron", SYNC_CRON);
+console.log("sync_tz", SYNC_TZ);
+
+
 type StoredSchedule = { id: string; cron: string; tz: string }
 
 function getQStashClient() {
@@ -33,7 +37,7 @@ export async function POST() {
 
     // Cron or timezone changed (or no schedule yet) — delete old and create new
     if (stored?.id) {
-      await qstash.schedules.delete(stored.id).catch(() => {})
+      await qstash.schedules.delete(stored.id).catch(() => { })
     }
 
     const dest = `${getBaseUrl()}/api/sync/background`
@@ -61,7 +65,7 @@ export async function DELETE() {
 
     const stored = await redis.get<StoredSchedule>(SYNC_SCHEDULE_ID_KEY)
     if (stored?.id) {
-      await qstash.schedules.delete(stored.id).catch(() => {})
+      await qstash.schedules.delete(stored.id).catch(() => { })
       await redis.del(SYNC_SCHEDULE_ID_KEY)
     }
 
