@@ -20,7 +20,7 @@ function getBaseUrl(): string {
 
 async function qstashCreateSchedule(dest: string, cron: string, tz: string): Promise<string> {
   const token = getQStashToken()
-  const res = await fetch(`https://qstash.upstash.io/v2/schedules/${encodeURIComponent(dest)}`, {
+  const res = await fetch(`https://qstash.upstash.io/v2/schedules/${dest}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -66,6 +66,7 @@ export async function POST() {
 
     return NextResponse.json({ ok: true, scheduleId })
   } catch (error) {
+    console.error('[sync/schedule] POST error:', error)
     const msg = error instanceof Error ? error.message : 'Internal server error'
     return NextResponse.json({ error: msg }, { status: 500 })
   }
