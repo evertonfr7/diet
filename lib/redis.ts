@@ -38,3 +38,4 @@ export function getTodayDate(): string {
 
 export const PUSH_SUBSCRIPTION_KEY = 'diet:push-subscription'
 export const PUSH_SCHEDULE_ID_KEY = 'diet:push-schedule-id'
+export const SYNC_SCHEDULE_ID_KEY = 'diet:sync-schedule-id'

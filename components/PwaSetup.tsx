@@ -16,6 +16,13 @@ export default function PwaSetup() {
   }, []);
 
   useEffect(() => {
+    // Register background sync schedule once per session
+    if (sessionStorage.getItem("sync-schedule-registered") === "true") return;
+    sessionStorage.setItem("sync-schedule-registered", "true");
+    fetch("/api/sync/schedule", { method: "POST" }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (localStorage.getItem("pwa-install-dismissed") === "true") return;
 
     function handleBeforeInstall(e: Event) {

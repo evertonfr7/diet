@@ -353,10 +353,8 @@ export default function DayView() {
       } else {
         setSyncMessage({
           type: "success",
-          text: "Dia sincronizado com sucesso! Refeições resetadas.",
+          text: "Dia sincronizado com sucesso!",
         });
-        setDayData({ refeicoes: [], agua: 0 });
-        setWaterIntake(0);
       }
     } catch {
       setSyncMessage({

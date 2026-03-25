@@ -42,14 +42,18 @@ self.addEventListener('push', (event) => {
   } catch {
     data = {}
   }
+
+  const isSyncResult = data.type === 'SYNC_RESULT'
   const title = data.title ?? '💧 Hora de beber água!'
   const body = data.body ?? 'Mantenha-se hidratado para um melhor desempenho.'
+  const tag = isSyncResult ? 'auto-sync' : 'water-reminder'
+
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon: '/icon-192.png',
       badge: '/icon-192.png',
-      tag: 'water-reminder',
+      tag,
       renotify: true,
     }),
   )

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getRedis, getDayKey, getTodayDate, DAY_TTL } from '@/lib/redis'
+import { getRedis, getDayKey, getTodayDate } from '@/lib/redis'
 import { db } from '@/lib/db'
 import type { DayData } from '@/lib/types'
 
@@ -35,18 +35,19 @@ export async function POST() {
     })
 
     const agua = dayData.agua ?? 0
-    const record = await db.syncRecord.create({
-      data: {
-        dailySummaryId: summary.id,
-        proteina,
-        gorduras,
-        carboidratos,
-        agua,
-      } as any,
+
+    const existing = await db.syncRecord.findFirst({
+      where: { dailySummaryId: summary.id },
     })
 
-    // Reseta as refeições e água do dia no Redis (mantém chave com array vazio e agua 0)
-    await redis.set(getDayKey(date), { refeicoes: [], agua: 0 }, { ex: DAY_TTL })
+    const record = existing
+      ? await db.syncRecord.update({
+          where: { id: existing.id },
+          data: { proteina, gorduras, carboidratos, agua } as any,
+        })
+      : await db.syncRecord.create({
+          data: { dailySummaryId: summary.id, proteina, gorduras, carboidratos, agua } as any,
+        })
 
     return NextResponse.json(record)
   } catch (error) {
