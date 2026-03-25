@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { Receiver } from '@upstash/qstash'
-import { getRedis, getDayKey, getTodayDate, DAY_TTL, PUSH_SUBSCRIPTION_KEY } from '@/lib/redis'
+import { getRedis, getDayKey, getTodayDate, DAY_TTL, PUSH_SUBSCRIPTION_KEY, SYNC_SCHEDULE_ID_KEY } from '@/lib/redis'
 import { db } from '@/lib/db'
 import type { DayData } from '@/lib/types'
 
@@ -96,6 +96,7 @@ export async function POST(request: Request) {
     })
 
     await redis.set(getDayKey(date), { refeicoes: [], agua: 0 }, { ex: DAY_TTL })
+    await redis.del(SYNC_SCHEDULE_ID_KEY)
 
     await sendSyncPush(true, false)
     return NextResponse.json({ ok: true })
