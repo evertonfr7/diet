@@ -3,8 +3,9 @@ import { Client } from '@upstash/qstash'
 import { getRedis, SYNC_SCHEDULE_ID_KEY } from '@/lib/redis'
 
 const SYNC_CRON = process.env.SYNC_CRON ?? '59 23 * * *'
+const SYNC_TZ = process.env.TZ_LOCAL ?? 'UTC'
 
-type StoredSchedule = { id: string; cron: string }
+type StoredSchedule = { id: string; cron: string; tz: string }
 
 function getQStashClient() {
   const token = process.env.QSTASH_TOKEN
@@ -25,27 +26,26 @@ export async function POST() {
 
     const stored = await redis.get<StoredSchedule>(SYNC_SCHEDULE_ID_KEY)
 
-    // Same cron already scheduled — nothing to do
-    if (stored?.cron === SYNC_CRON) {
+    // Same cron + timezone already scheduled — nothing to do
+    if (stored?.cron === SYNC_CRON && stored?.tz === SYNC_TZ) {
       return NextResponse.json({ ok: true, scheduleId: stored.id, existing: true })
     }
 
-    // Cron changed (or no schedule yet) — delete old and create new
+    // Cron or timezone changed (or no schedule yet) — delete old and create new
     if (stored?.id) {
       await qstash.schedules.delete(stored.id).catch(() => {})
     }
 
     const dest = `${getBaseUrl()}/api/sync/background`
-    const timezone = process.env.TZ_LOCAL ?? 'UTC'
 
     const { scheduleId } = await qstash.schedules.create({
       destination: dest,
       cron: SYNC_CRON,
       // @ts-expect-error — timezone is supported by QStash but not yet typed in the SDK
-      timezone,
+      timezone: SYNC_TZ,
     })
 
-    await redis.set(SYNC_SCHEDULE_ID_KEY, { id: scheduleId, cron: SYNC_CRON })
+    await redis.set(SYNC_SCHEDULE_ID_KEY, { id: scheduleId, cron: SYNC_CRON, tz: SYNC_TZ })
 
     return NextResponse.json({ ok: true, scheduleId })
   } catch (error) {
