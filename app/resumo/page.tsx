@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import MacroChart from "@/components/MacroChart";
 import type { SyncRecord } from "@/lib/types";
 
+export const revalidate = 300; // revalida a cada 5 minutos
+
 type SyncRecordWithAgua = SyncRecord & {
   agua: number;
   dailySummary: { date: string };
