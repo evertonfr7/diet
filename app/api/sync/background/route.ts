@@ -85,15 +85,19 @@ export async function POST(request: Request) {
     })
 
     const agua = dayData.agua ?? 0
-    await db.syncRecord.create({
-      data: {
-        dailySummaryId: summary.id,
-        proteina,
-        gorduras,
-        carboidratos,
-        agua,
-      } as any,
+
+    const existing = await db.syncRecord.findFirst({
+      where: { dailySummaryId: summary.id },
     })
+
+    existing
+      ? await db.syncRecord.update({
+          where: { id: existing.id },
+          data: { proteina, gorduras, carboidratos, agua },
+        })
+      : await db.syncRecord.create({
+          data: { dailySummaryId: summary.id, proteina, gorduras, carboidratos, agua },
+        })
 
     await redis.set(getDayKey(date), { refeicoes: [], agua: 0 }, { ex: DAY_TTL })
     await redis.del(SYNC_SCHEDULE_ID_KEY)
