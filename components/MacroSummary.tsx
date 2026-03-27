@@ -9,7 +9,7 @@ type Props = {
   targets: MacroTargets;
   waterIntake: number;
   waterGoal: number;
-  onAddWater: (ml: number) => void;
+  onOpenWaterModal: () => void;
 };
 
 function ProgressBar({
@@ -42,7 +42,7 @@ export default function MacroSummary({
   targets,
   waterIntake,
   waterGoal,
-  onAddWater,
+  onOpenWaterModal,
 }: Props) {
   const safeTargets: MacroTargets = targets || FALLBACK_TARGETS;
 
@@ -165,20 +165,12 @@ export default function MacroSummary({
           max={waterGoal}
           colorClass="bg-cyan-400"
         />
-        <div className="flex gap-2 mt-3">
-          <button
-            onClick={() => onAddWater(200)}
-            className="flex-1 text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-medium py-2 rounded-lg transition-colors"
-          >
-            +200ml
-          </button>
-          <button
-            onClick={() => onAddWater(350)}
-            className="flex-1 text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-medium py-2 rounded-lg transition-colors"
-          >
-            +350ml
-          </button>
-        </div>
+        <button
+          onClick={onOpenWaterModal}
+          className="w-full mt-3 py-2 text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-medium rounded-lg transition-colors"
+        >
+          + Adicionar água
+        </button>
       </div>
     </div>
   );

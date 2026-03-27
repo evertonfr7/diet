@@ -10,6 +10,7 @@ import type {
   MacroTargets,
 } from "@/lib/types";
 import MacroSummary from "./MacroSummary";
+import AddWaterModal from "./AddWaterModal";
 import MealSection from "./MealSection";
 import AddMealForm from "./AddMealForm";
 import AddItemModal from "./AddItemModal";
@@ -118,6 +119,7 @@ export default function DayView() {
 
   const [waterIntake, setWaterIntake] = useState(0);
   const [waterGoal, setWaterGoal] = useState(2000);
+  const [showWaterModal, setShowWaterModal] = useState(false);
 
   const today = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -155,8 +157,6 @@ export default function DayView() {
     }
     migrateWater();
   }, [todayKey]);
-
-  // Removed duplicate useEffect for fetching settings
 
   // Atualização otimista + API
   async function addWater(ml: number) {
@@ -447,8 +447,16 @@ export default function DayView() {
         targets={targets ?? DEFAULT_TARGETS}
         waterIntake={waterIntake}
         waterGoal={waterGoal}
-        onAddWater={addWater}
+        onOpenWaterModal={() => setShowWaterModal(true)}
       />
+
+      {/* Water Modal */}
+      {showWaterModal && (
+        <AddWaterModal
+          onAdd={addWater}
+          onClose={() => setShowWaterModal(false)}
+        />
+      )}
 
       {/* Protocol section */}
       <div>
