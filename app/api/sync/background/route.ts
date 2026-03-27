@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     existing
       ? await db.syncRecord.update({
           where: { id: existing.id },
-          data: { proteina, gorduras, carboidratos, agua },
+          data: { proteina, gorduras, carboidratos, agua, syncedAt: new Date() },
         })
       : await db.syncRecord.create({
           data: { dailySummaryId: summary.id, proteina, gorduras, carboidratos, agua },
