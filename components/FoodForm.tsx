@@ -34,6 +34,7 @@ export default function FoodForm({ onSuccess }: Props) {
     gorduras: "",
     carboidratos: "",
   });
+  const [quantidade, setQuantidade] = useState("");
   const [unidade, setUnidade] = useState<"g" | "ml">("g");
   const [loading, setLoading] = useState(false);
   const [estimating, setEstimating] = useState(false);
@@ -45,6 +46,17 @@ export default function FoodForm({ onSuccess }: Props) {
     !parseFloat(form.gorduras) &&
     !parseFloat(form.carboidratos);
 
+  const qty = parseFloat(quantidade);
+  const showPreview = qty > 0 && qty !== 100;
+
+  const previewMacros = showPreview
+    ? {
+        proteina: (parseFloat(form.proteina) || 0) / qty * 100,
+        gorduras: (parseFloat(form.gorduras) || 0) / qty * 100,
+        carboidratos: (parseFloat(form.carboidratos) || 0) / qty * 100,
+      }
+    : null;
+
   function handleChange(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -55,10 +67,15 @@ export default function FoodForm({ onSuccess }: Props) {
     setEstimating(true);
     setError("");
     try {
+      const qtyNum = parseFloat(quantidade);
+      const body: Record<string, string | number> = { nome: form.nome.trim(), unidade };
+      if (qtyNum > 0) {
+        body.quantidade = qtyNum;
+      }
       const res = await fetch("/api/foods/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: form.nome.trim(), unidade }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -82,13 +99,17 @@ export default function FoodForm({ onSuccess }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = {
+    const payload: Record<string, unknown> = {
       nome: form.nome.trim(),
       proteina: parseFloat(form.proteina) || 0,
       gorduras: parseFloat(form.gorduras) || 0,
       carboidratos: parseFloat(form.carboidratos) || 0,
       unidade,
     };
+    const qtyNum = parseFloat(quantidade);
+    if (qtyNum > 0) {
+      payload.quantidade = qtyNum;
+    }
     if (!payload.nome) return;
     setLoading(true);
     setError("");
@@ -102,6 +123,7 @@ export default function FoodForm({ onSuccess }: Props) {
       const food: Food = await res.json();
       onSuccess(food);
       setForm({ nome: "", proteina: "", gorduras: "", carboidratos: "" });
+      setQuantidade("");
       setUnidade("g");
       setOpen(false);
     } catch {
@@ -169,9 +191,26 @@ export default function FoodForm({ onSuccess }: Props) {
             ))}
           </div>
 
-          <p className="text-xs text-gray-400">
-            Macros por 100{unidade} do alimento:
-          </p>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500 whitespace-nowrap">
+              Macros por
+            </label>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={quantidade}
+              onChange={(e) => setQuantidade(e.target.value)}
+              placeholder="100"
+              className="w-20 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:ring-2 focus:ring-green-400"
+            />
+            <span className="text-xs text-gray-500">{unidade}</span>
+            {showPreview && (
+              <span className="text-xs text-green-600 ml-2">
+                ({qty > 100 ? "÷" : "×"} {(qty / 100).toFixed(2)} → por 100{unidade})
+              </span>
+            )}
+          </div>
 
           <div className="flex justify-end">
             <button
@@ -209,6 +248,37 @@ export default function FoodForm({ onSuccess }: Props) {
               </div>
             ))}
           </div>
+
+          {showPreview && previewMacros && (
+            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+              <p className="text-xs text-green-700 font-medium mb-1.5">
+                Preview por 100{unidade}:
+              </p>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-gray-600">P:</span>
+                  <span className="font-medium text-gray-800">
+                    {previewMacros.proteina.toFixed(1)}g
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  <span className="text-gray-600">G:</span>
+                  <span className="font-medium text-gray-800">
+                    {previewMacros.gorduras.toFixed(1)}g
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  <span className="text-gray-600">C:</span>
+                  <span className="font-medium text-gray-800">
+                    {previewMacros.carboidratos.toFixed(1)}g
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {allZero && (
             <p className="text-xs text-amber-500 flex items-center gap-1">

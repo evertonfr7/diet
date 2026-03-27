@@ -11,6 +11,7 @@ import { getRedis } from '@/lib/redis'
 const BodySchema = z.object({
   nome: z.string().min(2),
   unidade: z.enum(['g', 'ml']).default('g'),
+  quantidade: z.number().min(0.1).optional(),
 })
 
 const MacrosSchema = z.object({
@@ -44,11 +45,14 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { nome, unidade } = BodySchema.parse(body)
+    const { nome, unidade, quantidade } = BodySchema.parse(body)
+
+    const qty = quantidade && quantidade !== 100 ? quantidade : 100
+    const cacheKey = estimateCacheKey(nome, `${unidade}:${qty}`)
 
     // Tenta retornar do cache antes de chamar a IA
     const redis = getRedis()
-    const cached = await redis.get<Macros>(estimateCacheKey(nome, unidade))
+    const cached = await redis.get<Macros>(cacheKey)
     if (cached) {
       return NextResponse.json(cached)
     }
@@ -63,7 +67,7 @@ export async function POST(request: Request) {
     })
 
     const prompt =
-      `Você é um nutricionista. Dado o alimento "${nome}", retorne APENAS um JSON com os macronutrientes médios por 100${unidade}. ` +
+      `Você é um nutricionista. Dado o alimento "${nome}", retorne APENAS um JSON com os macronutrientes médios para ${qty}${unidade}. ` +
       `Responda estritamente no formato: {"proteina": number, "gorduras": number, "carboidratos": number}. ` +
       `Sem texto adicional, sem blocos de código, apenas o JSON.`
 
@@ -105,7 +109,7 @@ export async function POST(request: Request) {
     }
 
     // Salva no cache para evitar chamadas repetidas
-    await redis.set(estimateCacheKey(nome, unidade), macros, { ex: ESTIMATE_TTL })
+    await redis.set(cacheKey, macros, { ex: ESTIMATE_TTL })
 
     return NextResponse.json(macros)
   } catch (error) {
