@@ -43,10 +43,10 @@ export async function POST() {
     const record = existing
       ? await db.syncRecord.update({
           where: { id: existing.id },
-          data: { proteina, gorduras, carboidratos, agua } as any,
+          data: { proteina, gorduras, carboidratos, agua, syncedAt: new Date() },
         })
       : await db.syncRecord.create({
-          data: { dailySummaryId: summary.id, proteina, gorduras, carboidratos, agua } as any,
+          data: { dailySummaryId: summary.id, proteina, gorduras, carboidratos, agua },
         })
 
     return NextResponse.json(record)
