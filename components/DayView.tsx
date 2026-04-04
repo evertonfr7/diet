@@ -16,7 +16,9 @@ import AddMealForm from "./AddMealForm";
 import AddItemModal from "./AddItemModal";
 import FoodForm from "./FoodForm";
 import ParseMealModal from "./ParseMealModal";
+import AddLooseMacrosModal from "./AddLooseMacrosModal";
 import { FALLBACK_WATER_GOAL } from "@/lib/types";
+import type { LooseMacro } from "@/lib/types";
 
 function DashboardSkeleton() {
   return (
@@ -66,6 +68,11 @@ function calcTotals(dayData: DayData): MacroTotals {
       gorduras += item.gorduras;
       carboidratos += item.carboidratos;
     }
+  }
+  for (const avulso of dayData.avulsos ?? []) {
+    proteina += avulso.proteina;
+    gorduras += avulso.gorduras;
+    carboidratos += avulso.carboidratos;
   }
   return {
     proteina,
@@ -120,6 +127,7 @@ export default function DayView() {
   const [waterIntake, setWaterIntake] = useState(0);
   const [waterGoal, setWaterGoal] = useState(2000);
   const [showWaterModal, setShowWaterModal] = useState(false);
+  const [showLooseMacrosModal, setShowLooseMacrosModal] = useState(false);
 
   const today = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -339,6 +347,42 @@ export default function DayView() {
     }));
   }
 
+  async function handleAddLooseMacros(data: {
+    label?: string;
+    proteina: number;
+    gorduras: number;
+    carboidratos: number;
+  }) {
+    setMutationError("");
+    const res = await fetch("/api/day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "addLooseMacros", ...data }),
+    });
+    if (!res.ok) {
+      const json = await res.json();
+      setMutationError(json.error ?? "Erro ao adicionar macros.");
+      return;
+    }
+    const item: LooseMacro = await res.json();
+    setDayData((d) => ({ ...d, avulsos: [...(d.avulsos ?? []), item] }));
+  }
+
+  async function handleRemoveLooseMacro(id: string) {
+    setMutationError("");
+    const res = await fetch("/api/day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "removeLooseMacro", id }),
+    });
+    if (!res.ok) {
+      const json = await res.json();
+      setMutationError(json.error ?? "Erro ao remover macro.");
+      return;
+    }
+    setDayData((d) => ({ ...d, avulsos: (d.avulsos ?? []).filter((a) => a.id !== id) }));
+  }
+
   async function handleSync() {
     setSyncing(true);
     setSyncMessage(null);
@@ -409,6 +453,12 @@ export default function DayView() {
               />
               {syncing ? "Sincronizando..." : "Sincronizar"}
             </span>
+          </button>
+          <button
+            onClick={() => setShowLooseMacrosModal(true)}
+            className="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            + Macros avulsos
           </button>
           <FoodForm onSuccess={(food) => setFoods((f) => [...f, food])} />
         </div>
@@ -492,6 +542,47 @@ export default function DayView() {
         ))}
         <AddMealForm onAdd={handleAddMeal} />
       </div>
+
+      {/* Loose Macros Section */}
+      {(dayData.avulsos ?? []).length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+            Macros avulsos
+          </h3>
+          <div className="space-y-2">
+            {(dayData.avulsos ?? []).map((avulso) => (
+              <div
+                key={avulso.id}
+                className="flex items-center justify-between py-1.5"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-700">
+                    {avulso.label ?? "Avulso"}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    P {avulso.proteina}g · G {avulso.gorduras}g · C {avulso.carboidratos}g
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleRemoveLooseMacro(avulso.id)}
+                  className="p-1 rounded hover:bg-gray-100 transition-colors"
+                  aria-label="Remover"
+                >
+                  <X size={14} className="text-gray-400" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Loose Macros Modal */}
+      {showLooseMacrosModal && (
+        <AddLooseMacrosModal
+          onAdd={handleAddLooseMacros}
+          onClose={() => setShowLooseMacrosModal(false)}
+        />
+      )}
 
       {/* Add Item Modal */}
       {addItemModal && (

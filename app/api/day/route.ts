@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { getRedis, getDayKey, getTodayDate, DAY_TTL } from '@/lib/redis'
 import { db } from '@/lib/db'
-import type { DayData, Meal, MealItem } from '@/lib/types'
+import type { DayData, Meal, MealItem, LooseMacro } from '@/lib/types'
 
 async function getDayData(date: string): Promise<DayData> {
   const redis = getRedis()
@@ -70,6 +70,19 @@ const SetWaterSchema = z.object({
   ml: z.number().int().min(0),
 })
 
+const AddLooseMacrosSchema = z.object({
+  action: z.literal('addLooseMacros'),
+  label: z.string().optional(),
+  proteina: z.number().min(0),
+  gorduras: z.number().min(0),
+  carboidratos: z.number().min(0),
+})
+
+const RemoveLooseMacroSchema = z.object({
+  action: z.literal('removeLooseMacro'),
+  id: z.string(),
+})
+
 const ActionSchema = z.discriminatedUnion('action', [
   AddMealSchema,
   AddItemSchema,
@@ -78,6 +91,8 @@ const ActionSchema = z.discriminatedUnion('action', [
   AddItemsBulkSchema,
   AddWaterSchema,
   SetWaterSchema,
+  AddLooseMacrosSchema,
+  RemoveLooseMacroSchema,
 ])
 
 export async function POST(request: Request) {
@@ -146,6 +161,25 @@ export async function POST(request: Request) {
       case 'removeMeal': {
         dayData.refeicoes = dayData.refeicoes.filter((m) => m.id !== action.mealId)
         await saveDayData(date, dayData)
+        return NextResponse.json({ ok: true })
+      }
+
+      case 'addLooseMacros': {
+        const item: LooseMacro = {
+          id: randomUUID(),
+          label: action.label,
+          proteina: action.proteina,
+          gorduras: action.gorduras,
+          carboidratos: action.carboidratos,
+        }
+        const updated = { ...dayData, avulsos: [...(dayData.avulsos ?? []), item] }
+        await saveDayData(date, updated)
+        return NextResponse.json(item, { status: 201 })
+      }
+
+      case 'removeLooseMacro': {
+        const updated = { ...dayData, avulsos: (dayData.avulsos ?? []).filter((a) => a.id !== action.id) }
+        await saveDayData(date, updated)
         return NextResponse.json({ ok: true })
       }
 

@@ -32,9 +32,18 @@ export type Meal = {
   itens: MealItem[]
 }
 
+export type LooseMacro = {
+  id: string
+  label?: string
+  proteina: number
+  gorduras: number
+  carboidratos: number
+}
+
 export type DayData = {
   refeicoes: Meal[]
   agua: number // ml totais do dia, padrão 0
+  avulsos?: LooseMacro[]
 }
 
 export type DailySummary = {
