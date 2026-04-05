@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X, Sparkles, AlertTriangle } from "lucide-react";
+import { useState, useRef } from "react";
+import { X, Sparkles, AlertTriangle, Camera } from "lucide-react";
 import type { Food } from "@/lib/types";
 
 type Props = {
@@ -38,7 +38,10 @@ export default function FoodForm({ onSuccess }: Props) {
   const [unidade, setUnidade] = useState<"g" | "ml">("g");
   const [loading, setLoading] = useState(false);
   const [estimating, setEstimating] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const allZero =
     form.nome &&
@@ -97,6 +100,58 @@ export default function FoodForm({ onSuccess }: Props) {
     }
   }
 
+  async function handleScan(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setScanning(true)
+    setError("")
+    setPreviewUrl(URL.createObjectURL(file))
+
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const res = await fetch('/api/scan/nutrition', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error ?? 'Não foi possível escanear. Tente novamente.')
+        return
+      }
+
+      if (data.nome && !form.nome.trim()) {
+        setForm((prev) => ({ ...prev, nome: data.nome }))
+      }
+      setForm((prev) => ({
+        ...prev,
+        proteina: String(data.proteina),
+        gorduras: String(data.gorduras),
+        carboidratos: String(data.carboidratos),
+      }))
+
+      if (data.porcao) {
+        const match = data.porcao.match(/(\d+(?:[.,]\d+)?)/)
+        if (match) {
+          const num = parseFloat(match[1].replace(',', '.'))
+          if (num > 0 && num < 10000) {
+            setQuantidade(String(Math.round(num)))
+          }
+        }
+      }
+    } catch {
+      setError('Não foi possível escanear. Tente novamente.')
+    } finally {
+      setScanning(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const payload: Record<string, unknown> = {
@@ -125,6 +180,7 @@ export default function FoodForm({ onSuccess }: Props) {
       setForm({ nome: "", proteina: "", gorduras: "", carboidratos: "" });
       setQuantidade("");
       setUnidade("g");
+      setPreviewUrl(null);
       setOpen(false);
     } catch {
       setError("Erro ao salvar alimento. Tente novamente.");
@@ -150,7 +206,7 @@ export default function FoodForm({ onSuccess }: Props) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">Cadastrar alimento</h2>
           <button
-            onClick={() => setOpen(false)}
+            onClick={() => { setPreviewUrl(null); setOpen(false); }}
             className="text-gray-400 hover:text-gray-600 p-0.5"
             aria-label="Fechar"
           >
@@ -173,6 +229,55 @@ export default function FoodForm({ onSuccess }: Props) {
               required
             />
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleScan}
+            className="hidden"
+          />
+
+          {previewUrl && (
+            <div className="relative">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full h-32 object-contain bg-gray-50 rounded-lg border border-gray-200"
+              />
+              {scanning && (
+                <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">Processando...</span>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => setPreviewUrl(null)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {!previewUrl && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={scanning}
+              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 flex items-center justify-center gap-2 text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors disabled:opacity-50"
+            >
+              {scanning ? (
+                <span className="text-sm">Processando imagem...</span>
+              ) : (
+                <>
+                  <Camera size={18} strokeWidth={2} />
+                  <span className="text-sm">Escanear tabela nutricional</span>
+                </>
+              )}
+            </button>
+          )}
 
           <div className="flex gap-2">
             {(["g", "ml"] as const).map((u) => (
@@ -212,7 +317,22 @@ export default function FoodForm({ onSuccess }: Props) {
             )}
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={scanning}
+              className="text-xs text-orange-700 bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-40 flex items-center gap-1"
+            >
+              {scanning ? (
+                "Escaneando..."
+              ) : (
+                <>
+                  <Camera size={12} strokeWidth={2} />
+                  Escanear
+                </>
+              )}
+            </button>
             <button
               type="button"
               onClick={handleEstimate}
