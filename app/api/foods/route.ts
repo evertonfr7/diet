@@ -9,6 +9,7 @@ const FoodSchema = z.object({
   carboidratos: z.number().min(0),
   unidade: z.enum(['g', 'ml']).default('g'),
   quantidade: z.number().min(0.1).optional(),
+  porcao: z.number().min(0.1).optional(),
 })
 
 export async function GET() {
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const data = FoodSchema.parse(body)
-    const { quantidade, ...macros } = data
+    const { quantidade, porcao, ...macros } = data
 
     const finalMacros = quantidade && quantidade !== 100
       ? {
@@ -30,7 +31,14 @@ export async function POST(request: Request) {
         }
       : macros
 
-    const food = await db.food.create({ data: { nome: data.nome, ...finalMacros, unidade: data.unidade } })
+    const food = await db.food.create({
+      data: {
+        nome: data.nome,
+        ...finalMacros,
+        unidade: data.unidade,
+        porcao: porcao ?? (quantidade && quantidade !== 100 ? quantidade : null),
+      },
+    })
     return NextResponse.json(food, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {

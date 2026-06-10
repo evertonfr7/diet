@@ -25,7 +25,7 @@ export default function AddMealForm({ onAdd }: Props) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full py-4 border border-dashed border-green-300 rounded-2xl text-green-600 hover:bg-green-50 transition-colors text-sm font-medium"
+        className="w-full py-4 border border-dashed border-brand-300 rounded-2xl text-brand-600 hover:bg-brand-50 transition-colors text-sm font-medium"
       >
         + Adicionar Refeição
       </button>
@@ -43,12 +43,12 @@ export default function AddMealForm({ onAdd }: Props) {
         value={nome}
         onChange={(e) => setNome(e.target.value)}
         placeholder="Nome da refeição (ex: Café da manhã)"
-        className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+        className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
       />
       <button
         type="submit"
         disabled={loading || !nome.trim()}
-        className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
+        className="bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-700 disabled:opacity-50 transition-colors"
       >
         {loading ? "..." : "Adicionar"}
       </button>

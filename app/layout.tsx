@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import PwaSetup from "@/components/PwaSetup";
 
 export const metadata: Metadata = {
-  title: "Clinical Diet",
+  title: "Minha Dieta",
   description: "Monitoramento de dieta pessoal",
 };
 
@@ -23,7 +23,7 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta name="apple-mobile-web-app-title" content="Clinical Diet" />
+        <meta name="apple-mobile-web-app-title" content="Minha Dieta" />
       </head>
       <body className="bg-[#F4F7F5] min-h-screen">
         <PwaSetup />

@@ -45,6 +45,7 @@ export default function AddItemModal({
 
   const selectedFood = foods.find((f) => f.id === alimentoId);
   const unidade = selectedFood?.unidade ?? "g";
+  const porcao = selectedFood?.porcao ?? null;
   const qty = parseFloat(quantidade) || 0;
   const preview =
     selectedFood && qty > 0
@@ -102,7 +103,7 @@ export default function AddItemModal({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Digite para buscar..."
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 mb-2"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 mb-2"
                   autoFocus
                 />
               </div>
@@ -113,10 +114,13 @@ export default function AddItemModal({
                 </label>
                 <select
                   value={alimentoId}
-                  onChange={(e) =>
-                    setAlimentoId(e.target.value ? Number(e.target.value) : "")
-                  }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  onChange={(e) => {
+                    const id = e.target.value ? Number(e.target.value) : "";
+                    setAlimentoId(id);
+                    const food = foods.find((f) => f.id === id);
+                    setQuantidade(food?.porcao ? String(Math.round(food.porcao)) : "");
+                  }}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   required
                 >
                   <option value="">Selecione...</option>
@@ -127,8 +131,8 @@ export default function AddItemModal({
                   ) : (
                     filteredFoods.map((f) => (
                       <option key={f.id} value={f.id}>
-                        {f.nome} (P:{f.proteina}g · G:{f.gorduras}g · C:
-                        {f.carboidratos}g / 100{f.unidade ?? "g"})
+                        {f.nome} (P:{+f.proteina.toFixed(1)}g · G:{+f.gorduras.toFixed(1)}g · C:
+                        {+f.carboidratos.toFixed(1)}g / 100{f.unidade ?? "g"})
                       </option>
                     ))
                   )}
@@ -140,24 +144,47 @@ export default function AddItemModal({
                   Quantidade ({unidade})
                 </label>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {(unidade === "ml"
-                    ? [100, 150, 200, 250, 330, 500]
-                    : [30, 50, 100, 150, 200, 300]
-                  ).map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => setQuantidade(String(v))}
-                      className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
-                        quantidade === String(v)
-                          ? "bg-green-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700"
-                      }`}
-                    >
-                      {v}
-                      {unidade}
-                    </button>
-                  ))}
+                  {porcao
+                    ? [0.5, 1, 1.5, 2].map((mult) => {
+                        const v = Math.round(porcao * mult);
+                        const label =
+                          mult === 0.5 ? "½ porção" :
+                          mult === 1   ? "1 porção" :
+                          mult === 1.5 ? "1½ porção" :
+                                         "2 porções";
+                        return (
+                          <button
+                            key={mult}
+                            type="button"
+                            onClick={() => setQuantidade(String(v))}
+                            className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                              quantidade === String(v)
+                                ? "bg-brand-600 text-white"
+                                : "bg-gray-100 text-gray-600 hover:bg-brand-50 hover:text-brand-700"
+                            }`}
+                          >
+                            {label}
+                            <span className="opacity-60 ml-1">({v}{unidade})</span>
+                          </button>
+                        );
+                      })
+                    : (unidade === "ml"
+                        ? [100, 150, 200, 250, 330, 500]
+                        : [30, 50, 100, 150, 200, 300]
+                      ).map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => setQuantidade(String(v))}
+                          className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+                            quantidade === String(v)
+                              ? "bg-brand-600 text-white"
+                              : "bg-gray-100 text-gray-600 hover:bg-brand-50 hover:text-brand-700"
+                          }`}
+                        >
+                          {v}{unidade}
+                        </button>
+                      ))}
                 </div>
                 <input
                   type="number"
@@ -166,7 +193,7 @@ export default function AddItemModal({
                   value={quantidade}
                   onChange={(e) => setQuantidade(e.target.value)}
                   placeholder="ex: 150"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                   required
                 />
               </div>
@@ -192,7 +219,7 @@ export default function AddItemModal({
               <button
                 type="submit"
                 disabled={loading || !alimentoId || !quantidade}
-                className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
+                className="w-full bg-brand-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition-colors"
               >
                 {loading ? "Adicionando..." : "Adicionar"}
               </button>

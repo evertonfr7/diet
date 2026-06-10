@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, Sparkles, Save, Check } from "lucide-react";
 import type { Meal } from "@/lib/types";
+import SaveMealAsFoodModal from "./SaveMealAsFoodModal";
 
 type Props = {
   meal: Meal;
@@ -10,7 +11,7 @@ type Props = {
   onParseMeal: (mealId: string) => void;
   onRemoveItem: (mealId: string, itemId: string) => void;
   onRemoveMeal: (mealId: string) => void;
-  onSaveAsFood: (meal: Meal) => Promise<void>;
+  onSaveAsFood: (meal: Meal, nome: string, quantidade?: number) => Promise<void>;
 };
 
 export default function MealSection({
@@ -21,18 +22,13 @@ export default function MealSection({
   onRemoveMeal,
   onSaveAsFood,
 }: Props) {
-  const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
 
-  async function handleSave() {
-    setSaving(true);
-    try {
-      await onSaveAsFood(meal);
-      setSavedOk(true);
-      setTimeout(() => setSavedOk(false), 2500);
-    } finally {
-      setSaving(false);
-    }
+  async function handleConfirm(nome: string, quantidade?: number) {
+    await onSaveAsFood(meal, nome, quantidade);
+    setSavedOk(true);
+    setTimeout(() => setSavedOk(false), 2500);
   }
   const mealProtein = meal.itens.reduce((s, i) => s + i.proteina, 0);
   const mealFat = meal.itens.reduce((s, i) => s + i.gorduras, 0);
@@ -68,7 +64,7 @@ export default function MealSection({
         <div className="flex gap-2 mt-3">
           <button
             onClick={() => onAddItem(meal.id)}
-            className="flex-1 text-xs border border-green-200 text-green-700 hover:bg-green-50 px-2 py-2 rounded-xl font-medium transition-colors"
+            className="flex-1 text-xs border border-brand-200 text-brand-700 hover:bg-brand-50 px-2 py-2 rounded-xl font-medium transition-colors"
           >
             + Alimento
           </button>
@@ -81,8 +77,8 @@ export default function MealSection({
             por texto
           </button>
           <button
-            onClick={handleSave}
-            disabled={saving || meal.itens.length === 0}
+            onClick={() => setModalOpen(true)}
+            disabled={meal.itens.length === 0}
             className="flex-1 flex items-center justify-center gap-1 text-xs border border-purple-200 text-purple-700 hover:bg-purple-50 px-2 py-2 rounded-xl font-medium transition-colors disabled:opacity-40"
             title="Salvar refeição como alimento"
           >
@@ -91,8 +87,6 @@ export default function MealSection({
                 <Check size={11} strokeWidth={2.5} />
                 Salvo
               </>
-            ) : saving ? (
-              "..."
             ) : (
               <>
                 <Save size={11} strokeWidth={2} />
@@ -100,6 +94,14 @@ export default function MealSection({
               </>
             )}
           </button>
+
+          {modalOpen && (
+            <SaveMealAsFoodModal
+              meal={meal}
+              onConfirm={handleConfirm}
+              onClose={() => setModalOpen(false)}
+            />
+          )}
         </div>
       </div>
 

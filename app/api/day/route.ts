@@ -83,6 +83,11 @@ const RemoveLooseMacroSchema = z.object({
   id: z.string(),
 })
 
+const ApplyTemplatesSchema = z.object({
+  action: z.literal('applyTemplates'),
+  nomes: z.array(z.string().min(1)).min(1),
+})
+
 const ActionSchema = z.discriminatedUnion('action', [
   AddMealSchema,
   AddItemSchema,
@@ -93,6 +98,7 @@ const ActionSchema = z.discriminatedUnion('action', [
   SetWaterSchema,
   AddLooseMacrosSchema,
   RemoveLooseMacroSchema,
+  ApplyTemplatesSchema,
 ])
 
 export async function POST(request: Request) {
@@ -181,6 +187,16 @@ export async function POST(request: Request) {
         const updated = { ...dayData, avulsos: (dayData.avulsos ?? []).filter((a) => a.id !== action.id) }
         await saveDayData(date, updated)
         return NextResponse.json({ ok: true })
+      }
+
+      case 'applyTemplates': {
+        const existingNames = new Set(dayData.refeicoes.map((m) => m.nome))
+        const newMeals: Meal[] = action.nomes
+          .filter((n) => !existingNames.has(n))
+          .map((nome) => ({ id: randomUUID(), nome, itens: [] }))
+        dayData.refeicoes.push(...newMeals)
+        await saveDayData(date, dayData)
+        return NextResponse.json(newMeals, { status: 201 })
       }
 
       case 'addItemsBulk': {

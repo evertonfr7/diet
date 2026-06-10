@@ -120,7 +120,7 @@ export default function ParseMealModal({
               }}
               placeholder="Ex: 2 ovos fritos, 2 fatias de bacon e um café sem açúcar"
               rows={3}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
             />
           </div>
 
@@ -208,7 +208,7 @@ export default function ParseMealModal({
               <button
                 onClick={handleEstimate}
                 disabled={estimating || descricao.trim().length < 3}
-                className="flex-1 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
+                className="flex-1 bg-brand-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 disabled:opacity-50 transition-colors"
               >
                 {estimating ? (
                   "Estimando..."
@@ -232,7 +232,7 @@ export default function ParseMealModal({
               <button
                 onClick={handleConfirm}
                 disabled={saving || !itens || itens.length === 0}
-                className="flex-1 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
+                className="flex-1 bg-brand-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 disabled:opacity-50 transition-colors"
               >
                 {saving
                   ? "Adicionando..."

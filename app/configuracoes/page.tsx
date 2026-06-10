@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { Settings } from "@/lib/types";
+import { X } from "lucide-react";
+import type { Settings, MealTemplate } from "@/lib/types";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -17,6 +18,9 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
 export default function ConfiguracoesPage() {
   const [form, setForm] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [templates, setTemplates] = useState<MealTemplate[]>([]);
+  const [newTemplate, setNewTemplate] = useState("");
+  const [templateSaving, setTemplateSaving] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -36,24 +40,46 @@ export default function ConfiguracoesPage() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setForm(data);
-          localStorage.setItem(
-            "water-notif-enabled",
-            String(data.waterNotifEnabled),
-          );
-          localStorage.setItem(
-            "water-notif-interval",
-            String(data.waterNotifInterval),
-          );
+    Promise.all([
+      fetch("/api/settings").then((r) => r.json()),
+      fetch("/api/meal-templates").then((r) => r.json()),
+    ])
+      .then(([settingsData, templatesData]) => {
+        if (settingsData && !settingsData.error) {
+          setForm(settingsData);
+          localStorage.setItem("water-notif-enabled", String(settingsData.waterNotifEnabled));
+          localStorage.setItem("water-notif-interval", String(settingsData.waterNotifInterval));
         }
+        if (Array.isArray(templatesData)) setTemplates(templatesData);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleAddTemplate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newTemplate.trim()) return;
+    setTemplateSaving(true);
+    try {
+      const res = await fetch("/api/meal-templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome: newTemplate.trim() }),
+      });
+      if (res.ok) {
+        const t = await res.json();
+        setTemplates((prev) => [...prev, t]);
+        setNewTemplate("");
+      }
+    } finally {
+      setTemplateSaving(false);
+    }
+  }
+
+  async function handleDeleteTemplate(id: number) {
+    const res = await fetch(`/api/meal-templates/${id}`, { method: "DELETE" });
+    if (res.ok) setTemplates((prev) => prev.filter((t) => t.id !== id));
+  }
 
   function handleChange<K extends keyof Settings>(key: K) {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,7 +225,7 @@ export default function ConfiguracoesPage() {
       key: "calorieTarget" as const,
       label: "Calorias",
       unit: "kcal",
-      color: "focus:ring-green-500",
+      color: "focus:ring-brand-500",
     },
     {
       key: "proteinTarget" as const,
@@ -292,7 +318,7 @@ export default function ConfiguracoesPage() {
               <div
                 className={`px-4 py-3 rounded-xl text-sm font-medium ${
                   message.type === "success"
-                    ? "bg-green-50 text-green-700 border border-green-200"
+                    ? "bg-brand-50 text-brand-700 border border-brand-200"
                     : "bg-red-50 text-red-700 border border-red-200"
                 }`}
               >
@@ -303,12 +329,55 @@ export default function ConfiguracoesPage() {
             <button
               onClick={() => handleSave()}
               disabled={saving}
-              className="w-full bg-[#3a0d1b] text-white py-2.5 rounded-xl text-sm font-medium hover:bg-green-800 disabled:opacity-50 transition-colors mt-2"
+              className="w-full bg-[#3a0d1b] text-white py-2.5 rounded-xl text-sm font-medium hover:bg-brand-800 disabled:opacity-50 transition-colors mt-2"
             >
               {saving ? "Salvando..." : "Salvar configurações"}
             </button>
           </div>
         )}
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-5">
+          Refeições padrão
+        </h2>
+        <p className="text-xs text-gray-400 mb-4">
+          Defina as refeições que aparecem todo dia. Aplique com um clique na tela principal.
+        </p>
+
+        {templates.length > 0 && (
+          <ul className="space-y-2 mb-4">
+            {templates.map((t) => (
+              <li key={t.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5">
+                <span className="text-sm text-gray-800">{t.nome}</span>
+                <button
+                  onClick={() => handleDeleteTemplate(t.id)}
+                  className="text-gray-300 hover:text-red-400 transition-colors p-0.5"
+                  aria-label="Remover"
+                >
+                  <X size={15} strokeWidth={2} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form onSubmit={handleAddTemplate} className="flex gap-2">
+          <input
+            type="text"
+            value={newTemplate}
+            onChange={(e) => setNewTemplate(e.target.value)}
+            placeholder="ex: Café da manhã"
+            className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+          />
+          <button
+            type="submit"
+            disabled={templateSaving || !newTemplate.trim()}
+            className="bg-brand-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition-colors whitespace-nowrap"
+          >
+            Adicionar
+          </button>
+        </form>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm p-6">

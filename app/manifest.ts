@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Diet',
-    short_name: 'Diet',
+    name: 'Minha Dieta',
+    short_name: 'Minha Dieta',
     description: 'Monitoramento de dieta pessoal',
     start_url: '/',
     display: 'standalone',

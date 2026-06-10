@@ -14,6 +14,7 @@ model Food {
   gorduras     Float
   carboidratos Float
   unidade      String @default("g")
+  porcao       Float?
 }
 
 model DailySummary {
@@ -33,6 +34,12 @@ model SyncRecord {
   carboidratos   Float
   agua           Int         @default(0)   // ml ingeridos no dia
   syncedAt       DateTime    @default(now())
+}
+
+model MealTemplate {
+  id    Int    @id @default(autoincrement())
+  nome  String
+  ordem Int    @default(0)
 }
 
 model Settings {

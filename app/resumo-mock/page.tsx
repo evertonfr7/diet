@@ -43,7 +43,7 @@ export default function ResumoMockPage() {
       <div className="flex items-start justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-3xl font-bold text-[#3a0d1b] tracking-tight">
-            Inteligência <span className="text-green-600">Nutricional.</span>
+            Inteligência <span className="text-brand-600">Nutricional.</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Histórico sincronizado de macronutrientes
@@ -56,22 +56,22 @@ export default function ResumoMockPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="bg-[#3a0d1b] rounded-2xl p-6 text-white lg:col-span-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-green-300">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">
             Balanço Médio
           </p>
           <p className="text-4xl font-bold mt-2">
             {Math.round(avgKcal).toLocaleString("pt-BR")}
           </p>
-          <p className="text-green-300 text-sm mb-6">kcal / dia</p>
+          <p className="text-brand-300 text-sm mb-6">kcal / dia</p>
 
           <div className="space-y-3">
             {[
+              { label: "Carboidratos", pct: carbPct, color: "bg-brand-400" },
               { label: "Proteína", pct: protPct, color: "bg-blue-400" },
               { label: "Gorduras", pct: gordPct, color: "bg-amber-400" },
-              { label: "Carboidratos", pct: carbPct, color: "bg-green-400" },
             ].map(({ label, pct, color }) => (
               <div key={label}>
-                <div className="flex justify-between text-xs text-green-200 mb-1">
+                <div className="flex justify-between text-xs text-brand-200 mb-1">
                   <span>{label}</span>
                   <span>{pct}%</span>
                 </div>
