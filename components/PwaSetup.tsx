@@ -189,7 +189,7 @@ export default function PwaSetup() {
 
   return showBanner ? (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4">
-      <div className="bg-[#1A3A2A] text-white rounded-2xl shadow-xl px-4 py-4 flex items-center gap-3">
+      <div className="bg-[#955251] text-white rounded-2xl shadow-xl px-4 py-4 flex items-center gap-3">
         <span className="text-2xl flex-shrink-0">🌿</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">Instalar Clinical Diet</p>
@@ -199,7 +199,7 @@ export default function PwaSetup() {
         </div>
         <button
           onClick={handleInstall}
-          className="bg-white text-[#1A3A2A] text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0 hover:bg-green-50 transition-colors"
+          className="bg-white text-[#955251] text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0 hover:bg-green-50 transition-colors"
         >
           Instalar
         </button>

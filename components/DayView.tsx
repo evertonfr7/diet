@@ -434,7 +434,7 @@ export default function DayView() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
+          <h1 className="text-3xl font-bold text-[#955251] tracking-tight">
             {greeting}
           </h1>
           <p className="text-sm text-gray-500 capitalize mt-0.5">{today}</p>

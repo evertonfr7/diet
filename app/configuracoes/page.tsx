@@ -224,7 +224,7 @@ export default function ConfiguracoesPage() {
   return (
     <div className="space-y-6 max-w-lg">
       <div>
-        <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
+        <h1 className="text-3xl font-bold text-[#955251] tracking-tight">
           Configurações
         </h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -303,7 +303,7 @@ export default function ConfiguracoesPage() {
             <button
               onClick={() => handleSave()}
               disabled={saving}
-              className="w-full bg-[#1A3A2A] text-white py-2.5 rounded-xl text-sm font-medium hover:bg-green-800 disabled:opacity-50 transition-colors mt-2"
+              className="w-full bg-[#955251] text-white py-2.5 rounded-xl text-sm font-medium hover:bg-green-800 disabled:opacity-50 transition-colors mt-2"
             >
               {saving ? "Salvando..." : "Salvar configurações"}
             </button>
