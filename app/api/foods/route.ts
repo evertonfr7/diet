@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 
 const FoodSchema = z.object({
-  nome: z.string().min(1, 'Nome é obrigatório'),
+  nome: z.string().min(1, 'Nome é obrigatório').transform(s => s.replace(/[\p{Cf}]/gu, '').trim()),
   proteina: z.number().min(0),
   gorduras: z.number().min(0),
   carboidratos: z.number().min(0),

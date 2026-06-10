@@ -303,8 +303,9 @@ export default function DayView() {
     const proteina = meal.itens.reduce((s, i) => s + i.proteina, 0);
     const gorduras = meal.itens.reduce((s, i) => s + i.gorduras, 0);
     const carboidratos = meal.itens.reduce((s, i) => s + i.carboidratos, 0);
+    const nomeSanitized = nome.replace(/[\p{Cf}]/gu, '').trim();
     const body: Record<string, unknown> = {
-      nome,
+      nome: nomeSanitized,
       proteina: Math.round(proteina * 10) / 10,
       gorduras: Math.round(gorduras * 10) / 10,
       carboidratos: Math.round(carboidratos * 10) / 10,

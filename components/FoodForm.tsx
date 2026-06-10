@@ -154,8 +154,10 @@ export default function FoodForm({ onSuccess }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const nome = form.nome.replace(/[\p{Cf}]/gu, '').trim();
+    if (!nome) return;
     const payload: Record<string, unknown> = {
-      nome: form.nome.trim(),
+      nome,
       proteina: parseFloat(form.proteina) || 0,
       gorduras: parseFloat(form.gorduras) || 0,
       carboidratos: parseFloat(form.carboidratos) || 0,
@@ -165,7 +167,7 @@ export default function FoodForm({ onSuccess }: Props) {
     if (qtyNum > 0) {
       payload.quantidade = qtyNum;
     }
-    if (!payload.nome) return;
+    
     setLoading(true);
     setError("");
     try {
