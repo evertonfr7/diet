@@ -72,7 +72,7 @@ export default function AddLooseMacrosModal({ onAdd, onClose }: Props) {
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="Ex: Suplemento"
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#955251]/30"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3a0d1b]/30"
             />
           </div>
 
@@ -130,7 +130,7 @@ export default function AddLooseMacrosModal({ onAdd, onClose }: Props) {
           <button
             type="submit"
             disabled={!isValid}
-            className="w-full py-3 bg-[#955251] hover:bg-[#955251]/90 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium rounded-xl transition-colors"
+            className="w-full py-3 bg-[#3a0d1b] hover:bg-[#3a0d1b]/90 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium rounded-xl transition-colors"
           >
             Adicionar
           </button>

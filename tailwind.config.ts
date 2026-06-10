@@ -9,11 +9,11 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#955251',
-          50: '#F9F0F0',
-          100: '#EDD6D6',
-          700: '#6B3A39',
-          900: '#3D2020',
+          DEFAULT: '#3a0d1b',
+          50: '#fce8ed',
+          100: '#f0bfca',
+          700: '#26080f',
+          900: '#130407',
         },
       },
       fontFamily: {

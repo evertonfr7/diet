@@ -42,7 +42,7 @@ export default function ResumoMockPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-3xl font-bold text-[#955251] tracking-tight">
+          <h1 className="text-3xl font-bold text-[#3a0d1b] tracking-tight">
             Inteligência <span className="text-green-600">Nutricional.</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -55,7 +55,7 @@ export default function ResumoMockPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-[#955251] rounded-2xl p-6 text-white lg:col-span-1">
+        <div className="bg-[#3a0d1b] rounded-2xl p-6 text-white lg:col-span-1">
           <p className="text-xs font-semibold uppercase tracking-widest text-green-300">
             Balanço Médio
           </p>

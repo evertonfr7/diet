@@ -49,7 +49,7 @@ export default function MacroSummary({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
       {/* Calorias — hero card */}
-      <div className="col-span-2 lg:col-span-1 bg-[#955251] rounded-2xl p-5 text-white">
+      <div className="col-span-2 lg:col-span-1 bg-[#3a0d1b] rounded-2xl p-5 text-white">
         <div className="flex items-center gap-1.5">
           <Flame size={13} className="text-green-300" strokeWidth={2} />
           <p className="text-[10px] font-semibold uppercase tracking-widest text-green-300">

@@ -60,7 +60,7 @@ export default async function ResumoPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#955251] tracking-tight">
+          <h1 className="text-3xl font-bold text-[#3a0d1b] tracking-tight">
             Intelig&ecirc;ncia{" "}
             <span className="text-green-600">Nutricional.</span>
           </h1>
@@ -83,7 +83,7 @@ export default async function ResumoPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-[#955251] rounded-2xl p-6 text-white lg:col-span-1">
+          <div className="bg-[#3a0d1b] rounded-2xl p-6 text-white lg:col-span-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-green-300">
               Balan&ccedil;o M&eacute;dio
             </p>
