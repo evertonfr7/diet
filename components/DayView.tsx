@@ -8,6 +8,7 @@ import type {
   Meal,
   MacroTotals,
   MacroTargets,
+  MealTemplate,
 } from "@/lib/types";
 import MacroSummary from "./MacroSummary";
 import AddWaterModal from "./AddWaterModal";
@@ -108,6 +109,7 @@ function mapSettingsToTargets(settings: {
 export default function DayView() {
   const [dayData, setDayData] = useState<DayData>({ refeicoes: [], agua: 0 });
   const [foods, setFoods] = useState<Food[]>([]);
+  const [mealTemplates, setMealTemplates] = useState<MealTemplate[]>([]);
   const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -178,18 +180,21 @@ export default function DayView() {
 
   const fetchAll = useCallback(async () => {
     try {
-      const [dayRes, foodsRes, settingsRes] = await Promise.all([
+      const [dayRes, foodsRes, settingsRes, templatesRes] = await Promise.all([
         fetch("/api/day"),
         fetch("/api/foods"),
         fetch("/api/settings"),
+        fetch("/api/meal-templates"),
       ]);
-      const [day, foodsList, settingsData] = await Promise.all([
+      const [day, foodsList, settingsData, templatesList] = await Promise.all([
         dayRes.json(),
         foodsRes.json(),
         settingsRes.json(),
+        templatesRes.json(),
       ]);
       setDayData(day);
       setFoods(foodsList);
+      if (Array.isArray(templatesList)) setMealTemplates(templatesList);
       if (settingsData && !settingsData.error) {
         setTargets(mapSettingsToTargets(settingsData));
         setWaterGoal(settingsData.waterGoal ?? FALLBACK_WATER_GOAL);
@@ -206,6 +211,25 @@ export default function DayView() {
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
+
+  async function handleApplyTemplates() {
+    if (mealTemplates.length === 0) return;
+    setMutationError("");
+    const res = await fetch("/api/day", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "applyTemplates", nomes: mealTemplates.map((t) => t.nome) }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setMutationError(data.error ?? "Erro ao aplicar refeições padrão.");
+      return;
+    }
+    const newMeals: Meal[] = await res.json();
+    if (newMeals.length > 0) {
+      setDayData((d) => ({ ...d, refeicoes: [...d.refeicoes, ...newMeals] }));
+    }
+  }
 
   async function handleAddMeal(nome: string) {
     setMutationError("");
@@ -275,25 +299,26 @@ export default function DayView() {
     }));
   }
 
-  async function handleSaveAsFood(meal: Meal) {
+  async function handleSaveAsFood(meal: Meal, nome: string, quantidade?: number) {
     const proteina = meal.itens.reduce((s, i) => s + i.proteina, 0);
     const gorduras = meal.itens.reduce((s, i) => s + i.gorduras, 0);
     const carboidratos = meal.itens.reduce((s, i) => s + i.carboidratos, 0);
+    const body: Record<string, unknown> = {
+      nome,
+      proteina: Math.round(proteina * 10) / 10,
+      gorduras: Math.round(gorduras * 10) / 10,
+      carboidratos: Math.round(carboidratos * 10) / 10,
+      unidade: "g",
+    };
+    if (quantidade && quantidade > 0) body.quantidade = quantidade;
     const res = await fetch("/api/foods", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nome: meal.nome,
-        proteina: Math.round(proteina * 10) / 10,
-        gorduras: Math.round(gorduras * 10) / 10,
-        carboidratos: Math.round(carboidratos * 10) / 10,
-        unidade: "g",
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const data = await res.json();
-      setMutationError(data.error ?? "Erro ao salvar refeição como alimento.");
-      return;
+      throw new Error(data.error ?? "Erro ao salvar refeição como alimento.");
     }
     const food: Food = await res.json();
     setFoods((f) => [...f, food]);
@@ -434,7 +459,7 @@ export default function DayView() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
+          <h1 className="text-3xl font-bold text-[#3a0d1b] tracking-tight">
             {greeting}
           </h1>
           <p className="text-sm text-gray-500 capitalize mt-0.5">{today}</p>
@@ -469,7 +494,7 @@ export default function DayView() {
         <div
           className={`px-4 py-3 rounded-2xl text-sm font-medium ${
             syncMessage.type === "success"
-              ? "bg-green-50 text-green-700 border border-green-200"
+              ? "bg-brand-50 text-brand-700 border border-brand-200"
               : "bg-red-50 text-red-700 border border-red-200"
           }`}
         >
@@ -520,10 +545,27 @@ export default function DayView() {
         {dayData.refeicoes.length === 0 && (
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center text-gray-400">
             <p>Nenhuma refeição registrada hoje.</p>
-            <p className="text-sm mt-1">
-              Adicione uma refeição abaixo para começar.
-            </p>
+            {mealTemplates.length > 0 ? (
+              <button
+                onClick={handleApplyTemplates}
+                className="mt-3 bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors"
+              >
+                Aplicar refeições padrão
+              </button>
+            ) : (
+              <p className="text-sm mt-1">
+                Adicione uma refeição abaixo para começar.
+              </p>
+            )}
           </div>
+        )}
+        {mealTemplates.length > 0 && dayData.refeicoes.length > 0 && (
+          <button
+            onClick={handleApplyTemplates}
+            className="w-full text-xs text-brand-600 border border-brand-200 hover:bg-brand-50 py-2 rounded-xl font-medium transition-colors"
+          >
+            + Aplicar refeições padrão
+          </button>
         )}
         {dayData.refeicoes.map((meal) => (
           <MealSection
@@ -560,7 +602,7 @@ export default function DayView() {
                     {avulso.label ?? "Avulso"}
                   </span>
                   <span className="text-xs text-gray-400">
-                    P {avulso.proteina}g · G {avulso.gorduras}g · C {avulso.carboidratos}g
+                    P {+avulso.proteina.toFixed(1)}g · G {+avulso.gorduras.toFixed(1)}g · C {+avulso.carboidratos.toFixed(1)}g
                   </span>
                 </div>
                 <button

@@ -10,19 +10,19 @@ type Props = {
 
 const MACRO_FIELDS = [
   {
+    field: "carboidratos",
+    label: "Carboidratos (g)",
+    ringColor: "focus:ring-blue-400",
+  },
+  {
     field: "proteina",
     label: "Proteína (g)",
-    ringColor: "focus:ring-green-400",
+    ringColor: "focus:ring-brand-400",
   },
   {
     field: "gorduras",
     label: "Gorduras (g)",
     ringColor: "focus:ring-amber-400",
-  },
-  {
-    field: "carboidratos",
-    label: "Carboidratos (g)",
-    ringColor: "focus:ring-blue-400",
   },
 ] as const;
 
@@ -89,9 +89,9 @@ export default function FoodForm({ onSuccess }: Props) {
       }
       setForm((prev) => ({
         ...prev,
-        proteina: String(data.proteina),
-        gorduras: String(data.gorduras),
-        carboidratos: String(data.carboidratos),
+        proteina: String(Math.round(data.proteina * 10) / 10),
+        gorduras: String(Math.round(data.gorduras * 10) / 10),
+        carboidratos: String(Math.round(data.carboidratos * 10) / 10),
       }));
     } catch {
       setError("Não foi possível estimar. Preencha manualmente.");
@@ -128,9 +128,9 @@ export default function FoodForm({ onSuccess }: Props) {
       }
       setForm((prev) => ({
         ...prev,
-        proteina: String(data.proteina),
-        gorduras: String(data.gorduras),
-        carboidratos: String(data.carboidratos),
+        proteina: String(Math.round(data.proteina * 10) / 10),
+        gorduras: String(Math.round(data.gorduras * 10) / 10),
+        carboidratos: String(Math.round(data.carboidratos * 10) / 10),
       }))
 
       if (data.porcao) {
@@ -193,7 +193,7 @@ export default function FoodForm({ onSuccess }: Props) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-sm bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-xl font-semibold transition-colors"
+        className="text-sm bg-brand-600 text-white hover:bg-brand-700 px-4 py-2 rounded-xl font-semibold transition-colors"
       >
         + Novo alimento
       </button>
@@ -225,7 +225,7 @@ export default function FoodForm({ onSuccess }: Props) {
               value={form.nome}
               onChange={handleChange("nome")}
               placeholder="ex: Frango grelhado"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
               required
             />
           </div>
@@ -266,7 +266,7 @@ export default function FoodForm({ onSuccess }: Props) {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={scanning}
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 flex items-center justify-center gap-2 text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors disabled:opacity-50"
+              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 flex items-center justify-center gap-2 text-gray-500 hover:border-brand-400 hover:text-brand-600 transition-colors disabled:opacity-50"
             >
               {scanning ? (
                 <span className="text-sm">Processando imagem...</span>
@@ -287,8 +287,8 @@ export default function FoodForm({ onSuccess }: Props) {
                 onClick={() => setUnidade(u)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   unidade === u
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700"
+                    ? "bg-brand-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-brand-50 hover:text-brand-700"
                 }`}
               >
                 {u}
@@ -307,11 +307,11 @@ export default function FoodForm({ onSuccess }: Props) {
               value={quantidade}
               onChange={(e) => setQuantidade(e.target.value)}
               placeholder="100"
-              className="w-20 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-20 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
             <span className="text-xs text-gray-500">{unidade}</span>
             {showPreview && (
-              <span className="text-xs text-green-600 ml-2">
+              <span className="text-xs text-brand-600 ml-2">
                 ({qty > 100 ? "÷" : "×"} {(qty / 100).toFixed(2)} → por 100{unidade})
               </span>
             )}
@@ -370,13 +370,13 @@ export default function FoodForm({ onSuccess }: Props) {
           </div>
 
           {showPreview && previewMacros && (
-            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-              <p className="text-xs text-green-700 font-medium mb-1.5">
+            <div className="bg-brand-50 border border-brand-200 rounded-lg px-3 py-2">
+              <p className="text-xs text-brand-700 font-medium mb-1.5">
                 Preview por 100{unidade}:
               </p>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="w-2 h-2 rounded-full bg-brand-500" />
                   <span className="text-gray-600">P:</span>
                   <span className="font-medium text-gray-800">
                     {previewMacros.proteina.toFixed(1)}g
@@ -412,7 +412,7 @@ export default function FoodForm({ onSuccess }: Props) {
           <button
             type="submit"
             disabled={loading || !form.nome.trim()}
-            className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-brand-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition-colors"
           >
             {loading ? "Salvando..." : "Salvar alimento"}
           </button>

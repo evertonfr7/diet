@@ -80,9 +80,9 @@ export default function MacroChart({ data }: Props) {
             formatter={(v: number | string) => `${v}g`}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="Proteína" fill="#22c55e" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Gorduras" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Carboidratos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Carboidratos" fill="#60a5fa" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Proteína" fill="#9b3354" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Gorduras" fill="#fbbf24" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

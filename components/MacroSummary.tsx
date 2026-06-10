@@ -49,10 +49,10 @@ export default function MacroSummary({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
       {/* Calorias — hero card */}
-      <div className="col-span-2 lg:col-span-1 bg-[#1A3A2A] rounded-2xl p-5 text-white">
+      <div className="col-span-2 lg:col-span-1 bg-[#3a0d1b] rounded-2xl p-5 text-white">
         <div className="flex items-center gap-1.5">
-          <Flame size={13} className="text-green-300" strokeWidth={2} />
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-green-300">
+          <Flame size={13} className="text-brand-300" strokeWidth={2} />
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-300">
             Calorias
           </p>
         </div>
@@ -60,42 +60,19 @@ export default function MacroSummary({
           <span className="text-4xl font-bold leading-none">
             {Math.round(totals.calorias).toLocaleString("pt-BR")}
           </span>
-          <span className="text-sm text-green-300 mb-0.5">
+          <span className="text-sm text-brand-300 mb-0.5">
             / {safeTargets.calorias.toLocaleString("pt-BR")}
           </span>
         </div>
-        <p className="text-[11px] text-green-400 mt-0.5">kcal</p>
+        <p className="text-[11px] text-brand-400 mt-0.5">kcal</p>
         <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden mt-3">
           <div
-            className="h-full rounded-full bg-green-400 transition-all"
+            className="h-full rounded-full bg-brand-400 transition-all"
             style={{
               width: `${safeTargets.calorias > 0 ? Math.min(100, Math.round((totals.calorias / safeTargets.calorias) * 100)) : 0}%`,
             }}
           />
         </div>
-      </div>
-
-      {/* Proteína */}
-      <div className="bg-white rounded-2xl shadow-sm p-5">
-        <div className="flex items-center gap-1.5">
-          <Beef size={13} className="text-blue-400" strokeWidth={2} />
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-            Proteína
-          </p>
-        </div>
-        <div className="flex items-end gap-1 mt-1.5">
-          <span className="text-2xl font-bold text-gray-900">
-            {Math.round(totals.proteina)}g
-          </span>
-          <span className="text-xs text-gray-400 mb-0.5">
-            / {safeTargets.proteina}g
-          </span>
-        </div>
-        <ProgressBar
-          value={totals.proteina}
-          max={safeTargets.proteina}
-          colorClass="bg-blue-500"
-        />
       </div>
 
       {/* Carboidratos */}
@@ -118,6 +95,29 @@ export default function MacroSummary({
           value={totals.carboidratos}
           max={safeTargets.carboidratos}
           colorClass="bg-amber-400"
+        />
+      </div>
+
+      {/* Proteína */}
+      <div className="bg-white rounded-2xl shadow-sm p-5">
+        <div className="flex items-center gap-1.5">
+          <Beef size={13} className="text-blue-400" strokeWidth={2} />
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+            Proteína
+          </p>
+        </div>
+        <div className="flex items-end gap-1 mt-1.5">
+          <span className="text-2xl font-bold text-gray-900">
+            {Math.round(totals.proteina)}g
+          </span>
+          <span className="text-xs text-gray-400 mb-0.5">
+            / {safeTargets.proteina}g
+          </span>
+        </div>
+        <ProgressBar
+          value={totals.proteina}
+          max={safeTargets.proteina}
+          colorClass="bg-blue-500"
         />
       </div>
 

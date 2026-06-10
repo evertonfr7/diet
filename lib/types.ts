@@ -6,6 +6,12 @@ export const FALLBACK_TARGETS: MacroTargets = {
 };
 
 export const FALLBACK_WATER_GOAL = 2000;
+export type MealTemplate = {
+  id: number
+  nome: string
+  ordem: number
+}
+
 export type Food = {
   id: number
   nome: string
@@ -13,6 +19,7 @@ export type Food = {
   gorduras: number
   carboidratos: number
   unidade: 'g' | 'ml'
+  porcao?: number | null
 }
 
 export type MealItem = {

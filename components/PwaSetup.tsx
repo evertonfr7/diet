@@ -189,23 +189,23 @@ export default function PwaSetup() {
 
   return showBanner ? (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4">
-      <div className="bg-[#1A3A2A] text-white rounded-2xl shadow-xl px-4 py-4 flex items-center gap-3">
+      <div className="bg-[#3a0d1b] text-white rounded-2xl shadow-xl px-4 py-4 flex items-center gap-3">
         <span className="text-2xl flex-shrink-0">🌿</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold">Instalar Clinical Diet</p>
-          <p className="text-xs text-green-300 mt-0.5">
+          <p className="text-sm font-semibold">Instalar Minha Dieta</p>
+          <p className="text-xs text-brand-300 mt-0.5">
             Acesse mais rápido pela tela inicial
           </p>
         </div>
         <button
           onClick={handleInstall}
-          className="bg-white text-[#1A3A2A] text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0 hover:bg-green-50 transition-colors"
+          className="bg-white text-[#3a0d1b] text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0 hover:bg-brand-50 transition-colors"
         >
           Instalar
         </button>
         <button
           onClick={handleDismiss}
-          className="text-green-400 hover:text-white transition-colors flex-shrink-0 p-1"
+          className="text-brand-400 hover:text-white transition-colors flex-shrink-0 p-1"
           aria-label="Fechar"
         >
           <X size={16} strokeWidth={2} />

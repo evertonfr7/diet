@@ -60,9 +60,9 @@ export default async function ResumoPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A3A2A] tracking-tight">
+          <h1 className="text-3xl font-bold text-[#3a0d1b] tracking-tight">
             Intelig&ecirc;ncia{" "}
-            <span className="text-green-600">Nutricional.</span>
+            <span className="text-brand-600">Nutricional.</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Hist&oacute;rico sincronizado de macronutrientes
@@ -83,23 +83,23 @@ export default async function ResumoPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-[#1A3A2A] rounded-2xl p-6 text-white lg:col-span-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-green-300">
+          <div className="bg-[#3a0d1b] rounded-2xl p-6 text-white lg:col-span-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">
               Balan&ccedil;o M&eacute;dio
             </p>
             <p className="text-4xl font-bold mt-2">
               {Math.round(avgKcal).toLocaleString("pt-BR")}
             </p>
-            <p className="text-green-300 text-sm mb-6">kcal / dia</p>
+            <p className="text-brand-300 text-sm mb-6">kcal / dia</p>
 
             <div className="space-y-3 mb-4">
               {[
-                { label: "Proteína", pct: protPct, color: "bg-green-400" },
-                { label: "Gorduras", pct: gordPct, color: "bg-amber-400" },
                 { label: "Carboidratos", pct: carbPct, color: "bg-blue-400" },
+                { label: "Proteína", pct: protPct, color: "bg-brand-400" },
+                { label: "Gorduras", pct: gordPct, color: "bg-amber-400" },
               ].map(({ label, pct, color }) => (
                 <div key={label}>
-                  <div className="flex justify-between text-xs text-green-200 mb-1">
+                  <div className="flex justify-between text-xs text-brand-200 mb-1">
                     <span>{label}</span>
                     <span>{pct}%</span>
                   </div>
@@ -112,7 +112,7 @@ export default async function ResumoPage() {
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-2 text-green-200 text-xs">
+            <div className="flex items-center gap-2 text-brand-200 text-xs">
               <span>Água média:</span>
               <span className="font-bold text-white">
                 {Math.round(avgAgua).toLocaleString("pt-BR")}
